@@ -50,10 +50,10 @@ public class Testing extends LinearOpMode {
             // Make this Color Formatting System Simpler
 
             if(rob.lift.getEncoderPosition() < 0 || rob.lift.getEncoderPosition() > 200) {
-                telemetry.addData("Lift Position", Color.RED.format(rob.lift.getEncoderPosition()));
+                rob.telemetry.addData("Lift Position", Color.RED.format(rob.lift.getEncoderPosition()));
             }
             else {
-                telemetry.addData("Lift Position", Color.GREEN.format(rob.lift.getEncoderPosition()));
+                rob.telemetry.addData("Lift Position", Color.GREEN.format(rob.lift.getEncoderPosition()));
             }
 
 

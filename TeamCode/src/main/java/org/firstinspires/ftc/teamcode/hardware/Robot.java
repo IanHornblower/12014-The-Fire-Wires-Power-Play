@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain.whee
 
 import android.view.animation.LinearInterpolator;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -22,6 +24,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.IMU;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Jimmy;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.SleeveDetectionCamera;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.T265;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 
@@ -36,6 +39,9 @@ public class Robot {
     public Lift lift;
     public IMU imu;
     public T265 t265;
+    public SleeveDetectionCamera sleeveDetectionCamera;
+
+    public MultipleTelemetry telemetry;
 
     public HardwareMap hwMap;
 
@@ -43,7 +49,7 @@ public class Robot {
 
     // Gamepad 1 & 2
 
-    public Robot (HardwareMap hwMap, Telemetry telemetry) {
+    public Robot (HardwareMap hwMap, Telemetry o_telemetry) {
         this.hwMap = hwMap;
         driveTrain = new DriveTrain(this);
         intake = new Intake(this);          // DONE
@@ -52,9 +58,15 @@ public class Robot {
         //imu = new IMU(this);
         //t265 = new T265(hwMap);
         //Jameson2Turnt = new Jimmy(this);
+        sleeveDetectionCamera = new SleeveDetectionCamera(this);
 
-        subsystems = new Subsystem[] {driveTrain, intake, lift};
+
+        subsystems = new Subsystem[] {driveTrain, intake, lift, sleeveDetectionCamera};
         //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
+
+        o_telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     public double trackWidth() {

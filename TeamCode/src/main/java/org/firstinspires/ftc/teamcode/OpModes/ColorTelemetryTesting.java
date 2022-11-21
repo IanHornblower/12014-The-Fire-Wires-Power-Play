@@ -18,7 +18,6 @@ public class ColorTelemetryTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
         MultipleTelemetry m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
