@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.hardware.DriveConstraints.VY_WEIGHT
 import static org.firstinspires.ftc.teamcode.hardware.DriveConstraints.dt_trackWidth;
 import static org.firstinspires.ftc.teamcode.hardware.DriveConstraints.maxAngularVelocity;
 import static org.firstinspires.ftc.teamcode.hardware.DriveConstraints.maxVelocity;
-import static org.firstinspires.ftc.teamcode.hardware.DriveConstraints.wheelBase;
 
 import com.ThermalEquilibrium.homeostasis.Utils.Vector;
 import com.acmerobotics.dashboard.config.Config;
@@ -15,11 +14,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-//import org.firstinspires.ftc.teamcode.control.MecanumLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.util.Encoder;
 
 @Config
 public class DriveTrain implements Subsystem {
@@ -35,7 +32,7 @@ public class DriveTrain implements Subsystem {
 
     HardwareMap hwMap;
 
-//    public MecanumLocalizer localizer;
+    //public MecanumLocalizer localizer;
 
     public DriveTrain(Robot robot) {
         hwMap = robot.hwMap;
@@ -46,7 +43,7 @@ public class DriveTrain implements Subsystem {
 
         motors = new DcMotorEx[] {frontLeft, frontRight, backLeft, backRight};
 
-      //  localizer = new MecanumLocalizer(robot);
+        //localizer = new MecanumLocalizer(robot);
     }
 
     public HardwareMap getHardwareMap() {

@@ -54,7 +54,7 @@ public class Robot {
         driveTrain = new DriveTrain(this);
         intake = new Intake(this);          // DONE
         lift = new Lift(this);              // PENDING
-        //coneManipulator = new ConeManipulator(this);  // NOT STARTED
+        coneManipulator = new ConeManipulator(this);  // NOT STARTED
         //imu = new IMU(this);
         //t265 = new T265(hwMap);
         //Jameson2Turnt = new Jimmy(this);
@@ -64,9 +64,6 @@ public class Robot {
         subsystems = new Subsystem[] {driveTrain, intake, lift, sleeveDetectionCamera};
         //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
 
-        o_telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     public double trackWidth() {

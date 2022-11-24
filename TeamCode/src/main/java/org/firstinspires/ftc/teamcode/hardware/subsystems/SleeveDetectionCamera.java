@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamServer;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.util.Color;
@@ -10,17 +13,19 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.security.PublicKey;
+
 public class SleeveDetectionCamera implements Subsystem {
 
-    SleeveDetection sleeveDetection;
-    OpenCvCamera camera;
+    public SleeveDetection sleeveDetection;
+    public OpenCvCamera camera;
 
     // Name of the Webcam to be set in the config
     String webcamName = "BackCamera";
 
     int resWidth = 320;
     int resHeight = 240;
-    OpenCvCameraRotation cameraRotation = OpenCvCameraRotation.UPRIGHT;
+    OpenCvCameraRotation cameraRotation = OpenCvCameraRotation.UPSIDE_DOWN;
     public SleeveDetection.ParkingPosition position = SleeveDetection.ParkingPosition.LEFT;
 
     public SleeveDetectionCamera(Robot robot) {
@@ -30,9 +35,18 @@ public class SleeveDetectionCamera implements Subsystem {
         camera.setPipeline(sleeveDetection);
     }
 
+    public OpenCvCamera getCamera() {
+        return camera;
+    }
+
     public void setCameraResolution(int width, int height) {
         resWidth = width;
         resHeight = height;
+    }
+
+    public void disableCamera() {
+        camera.stopRecordingPipeline();
+        camera.stopStreaming();
     }
 
     public void setCameraRotation(OpenCvCameraRotation rotation) {
@@ -67,6 +81,9 @@ public class SleeveDetectionCamera implements Subsystem {
             @Override
             public void onError(int errorCode) {}
         });
+
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
+        CameraStreamServer.getInstance().setSource(camera);
     }
 
     @Override

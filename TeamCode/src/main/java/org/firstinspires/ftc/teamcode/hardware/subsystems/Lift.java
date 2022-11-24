@@ -46,7 +46,7 @@ public class Lift implements Subsystem {
     }
 
     public double getEncoderPosition() {
-        return lower.getCurrentPosition();
+        return -lower.getCurrentPosition();
     }
 
     public void setPower(double power) {
@@ -56,8 +56,8 @@ public class Lift implements Subsystem {
 
     @Override
     public void init() throws InterruptedException {
-        upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override

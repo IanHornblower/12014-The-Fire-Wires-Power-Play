@@ -1,25 +1,17 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Actual;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.ejml.data.DGrowArray;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.util.Color;
 
 @Config
-@TeleOp
-public class Testing extends LinearOpMode {
-
-
-    // Intake
-    // Lift
-    // Minip
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp
+public class TeleOp extends LinearOpMode {
 
     public static double intakeSpeed = 0.0;
     public static double liftSpeed = 0.5;
@@ -34,15 +26,14 @@ public class Testing extends LinearOpMode {
 
         Robot rob = new Robot(hardwareMap, telemetry);
 
+
         rob.init();
 
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()) {
 
-            if(gamepad1.right_bumper) rob.intake.start();
-            else if (gamepad1.left_bumper) rob.intake.reverse();
-            else rob.intake.stop();
+            rob.intake.setPower(intakeSpeed);
 
             rob.driveTrain.setMotorPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 
@@ -50,25 +41,19 @@ public class Testing extends LinearOpMode {
 
             rob.lift.setPower(liftPower);
 
-            if(gamepad1.dpad_down) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.IN_MOST);
+
+            // Make this Color Formatting System Simpler
+
+            if(rob.lift.getEncoderPosition() < 0 || rob.lift.getEncoderPosition() > 200) {
+                telemetry.addData("Lift Position", Color.RED.format(rob.lift.getEncoderPosition()));
             }
-            if(gamepad1.dpad_left) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
-            }
-            if(gamepad1.dpad_up) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.Vertiacal);
-            }
-            if(gamepad1.dpad_right) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
+            else {
+                telemetry.addData("Lift Position", Color.GREEN.format(rob.lift.getEncoderPosition()));
             }
 
-            if(gamepad1.x) {
-                rob.coneManipulator.open();
-            }
-            if(gamepad1.b) {
-                rob.coneManipulator.close();
-            }
+
+            rob.coneManipulator.setLeft(left);
+            rob.coneManipulator.setRight(right);
 
             telemetry.update();
 

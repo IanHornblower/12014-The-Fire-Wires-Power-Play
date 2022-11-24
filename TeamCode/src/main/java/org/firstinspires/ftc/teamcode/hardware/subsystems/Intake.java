@@ -28,6 +28,18 @@ public class Intake implements Subsystem {
         right = hwMap.get(DcMotor.class, "rightIntake");
     }
 
+    public void start() {
+        setPower(speed);
+    }
+
+    public void reverse() {
+        setPower(-speed);
+    }
+
+    public void stop() {
+        setPower(0.0);
+    }
+
     public void setPower(double power) {
         left_p = power * -multiplier;
         right_p = power * multiplier;
