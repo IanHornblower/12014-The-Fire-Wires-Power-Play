@@ -32,7 +32,7 @@ public class Testing extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry.setItemSeparator(" >> ");
 
-        Robot rob = new Robot(hardwareMap, telemetry);
+        Robot rob = new Robot(hardwareMap, Robot.OPMODE_TYPE.TELEOP);
 
         rob.init();
 
@@ -70,9 +70,14 @@ public class Testing extends LinearOpMode {
                 rob.coneManipulator.close();
             }
 
+            telemetry.addData("Lift Position", rob.lift.getEncoderPosition());
             telemetry.update();
 
-            rob.update();
+            try {
+                rob.update();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

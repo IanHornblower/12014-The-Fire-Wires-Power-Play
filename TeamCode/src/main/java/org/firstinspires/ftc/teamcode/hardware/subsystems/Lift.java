@@ -17,9 +17,13 @@ public class Lift implements Subsystem {
     HardwareMap hwMap;
 
     public static double lowest = 0;
-    public static double top = 100;
+    public static double lowResting = 0;
+    public static double smallPole = 0;
+    public static double middlePole = 0;
+    public static double highPole = 0;
+    public static double top = 2600;
 
-    double lower_p = 0.0, upper_p = 0.0;
+    public static double kP = 0.007;
 
     public static double feedfoward = 0.0;
 
@@ -31,22 +35,21 @@ public class Lift implements Subsystem {
         upper = hwMap.get(DcMotorEx.class, "upperLift");
     }
 
-    public void controlLift(double power) {
-        double ff = getEncoderPosition() * feedfoward;
-
-        setPower(ff + power);
-    }
 
     public void setPosition(double power, double position, double tolerance) {
         double multiplier = Math.signum(position - getEncoderPosition());
-
-
 
         setPower(power * multiplier);
     }
 
     public double getEncoderPosition() {
-        return -lower.getCurrentPosition();
+        return lower.getCurrentPosition();
+    }
+
+    public void runToPosition(double position) {
+        double error = position - getEncoderPosition();
+
+        setPower(error * kP);
     }
 
     public void setPower(double power) {
@@ -56,8 +59,14 @@ public class Lift implements Subsystem {
 
     @Override
     public void init() throws InterruptedException {
-        //upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        upper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lower.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        upper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lower.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        upper.setDirection(DcMotorSimple.Direction.REVERSE);
+        lower.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override

@@ -33,7 +33,7 @@ public class Jimmy implements Subsystem {
             Jameson.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
-        joe.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        ///joe.setPwmRange(new PwmControl.PwmRange(500, 2500));
     }
 
     @Override

@@ -11,10 +11,7 @@ public class ActionSequence {
 
     ArrayList<Action> actionSequence;
 
-    DriveTrain dt;
-
-    public ActionSequence(Robot robot) {
-        dt = robot.driveTrain;
+    public ActionSequence() {
         actionSequence = new ArrayList<>();
     }
 

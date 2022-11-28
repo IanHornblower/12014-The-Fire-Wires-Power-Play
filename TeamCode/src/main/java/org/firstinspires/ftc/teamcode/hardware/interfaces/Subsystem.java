@@ -4,5 +4,5 @@ public interface Subsystem {
 
     void init() throws InterruptedException;
 
-    void update() throws InterruptedException;
+    void update() throws Exception;
 }

@@ -40,6 +40,7 @@ public class Robot {
     public IMU imu;
     public T265 t265;
     public SleeveDetectionCamera sleeveDetectionCamera;
+    public Subsystem poleDetection; // duh!
 
     public MultipleTelemetry telemetry;
 
@@ -47,22 +48,39 @@ public class Robot {
 
     Subsystem[] subsystems = {};
 
-    // Gamepad 1 & 2
+    public enum OPMODE_TYPE {
+        AUTO(true),
+        TELEOP(false);
 
-    public Robot (HardwareMap hwMap, Telemetry o_telemetry) {
+        boolean b;
+
+        OPMODE_TYPE(boolean b) {
+            this.b = b;
+        }
+
+        public boolean getValue() {
+            return b;
+        }
+    }
+
+    public Robot (HardwareMap hwMap, OPMODE_TYPE type) {
         this.hwMap = hwMap;
         driveTrain = new DriveTrain(this);
         intake = new Intake(this);          // DONE
         lift = new Lift(this);              // PENDING
-        coneManipulator = new ConeManipulator(this);  // NOT STARTED
+        coneManipulator = new ConeManipulator(this);   // DONE
         //imu = new IMU(this);
         //t265 = new T265(hwMap);
         //Jameson2Turnt = new Jimmy(this);
         sleeveDetectionCamera = new SleeveDetectionCamera(this);
 
-
-        subsystems = new Subsystem[] {driveTrain, intake, lift, sleeveDetectionCamera};
-        //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
+        if(type.getValue()) {
+            subsystems = new Subsystem[] {driveTrain, intake, lift, sleeveDetectionCamera, coneManipulator};
+        }
+        else {
+            subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
+            //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, poleDetection};
+        }
 
     }
 
@@ -118,7 +136,7 @@ public class Robot {
 
         PhotonCore.enable();
     }
-    public void update() throws InterruptedException {
+    public void update() throws Exception {
         for (Subsystem subsystem : subsystems){
             subsystem.update();
         }

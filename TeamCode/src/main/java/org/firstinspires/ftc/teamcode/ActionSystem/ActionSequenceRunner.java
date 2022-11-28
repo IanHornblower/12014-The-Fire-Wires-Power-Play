@@ -28,7 +28,7 @@ public class ActionSequenceRunner {
         this.actionList = actionSequence.getActionList();
     }
 
-    public void update() throws InterruptedException {
+    public void update() throws Exception {
         if (!hasStartedAction) {
             actionList.get(currentState).startAction();
             hasStartedAction = true;
