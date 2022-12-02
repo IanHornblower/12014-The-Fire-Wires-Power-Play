@@ -47,8 +47,8 @@ public class TeleOpAction {
         actionSequence.add(new Wait(seconds));
     }
 
-    public boolean isComplete() {
-        return getActionList().get(getActionList().size()-1).isComplete;
+    public boolean isActionRunning() {
+        return currentState > 0 && currentState != getActionList().size()-1;
     }
 
     public void reset() {

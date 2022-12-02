@@ -29,7 +29,7 @@ public class ConeManipulator implements Subsystem {
     public static double grabberOpen = 0.5;
     public static double grabberClose = 0.3 ;
 
-    TeleOpAction[] actions;
+    public TeleOpAction[] actions;
     public TeleOpAction grabCone;
     public TeleOpAction dropConeAndReturn;
     public TeleOpAction raiseToTop;
