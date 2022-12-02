@@ -32,7 +32,7 @@ public class Testing extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry.setItemSeparator(" >> ");
 
-        Robot rob = new Robot(hardwareMap, Robot.OPMODE_TYPE.TELEOP);
+        Robot rob = new Robot(hardwareMap, telemetry, Robot.OPMODE_TYPE.TELEOP);
 
         rob.init();
 

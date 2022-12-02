@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 import static org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain.lateralMultiplier;
 import static org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain.trackWidth;
 import static org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain.wheelBase;
 
-import android.view.animation.LinearInterpolator;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -24,7 +18,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.IMU;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Jimmy;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.SleeveDetectionCamera;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.RearCamera;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.T265;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 
@@ -39,49 +33,69 @@ public class Robot {
     public Lift lift;
     public IMU imu;
     public T265 t265;
-    public SleeveDetectionCamera sleeveDetectionCamera;
+    public RearCamera rearCamera;
     public Subsystem poleDetection; // duh!
 
-    public MultipleTelemetry telemetry;
+    Telemetry telemetry;
 
     public HardwareMap hwMap;
 
     Subsystem[] subsystems = {};
 
     public enum OPMODE_TYPE {
-        AUTO(true),
-        TELEOP(false);
+        AUTO(0),
+        TELEOP(1),
+        DASHBOARD_TESTING(2);
 
-        boolean b;
+        int v;
 
-        OPMODE_TYPE(boolean b) {
-            this.b = b;
+        OPMODE_TYPE(int v) {
+            this.v = v;
         }
 
-        public boolean getValue() {
-            return b;
+        public int getValue() {
+            return v;
         }
     }
 
-    public Robot (HardwareMap hwMap, OPMODE_TYPE type) {
+    public Robot (HardwareMap hwMap, Telemetry telemetry, OPMODE_TYPE type) {
         this.hwMap = hwMap;
-        driveTrain = new DriveTrain(this);
-        intake = new Intake(this);          // DONE
-        lift = new Lift(this);              // PENDING
-        coneManipulator = new ConeManipulator(this);   // DONE
-        //imu = new IMU(this);
-        //t265 = new T265(hwMap);
-        //Jameson2Turnt = new Jimmy(this);
-        sleeveDetectionCamera = new SleeveDetectionCamera(this);
 
-        if(type.getValue()) {
-            subsystems = new Subsystem[] {driveTrain, intake, lift, sleeveDetectionCamera, coneManipulator};
-        }
-        else {
-            subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
-            //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, poleDetection};
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        switch (type.getValue()) {
+            case 0: // Auto
+                driveTrain = new DriveTrain(this);
+                intake = new Intake(this);          // DONE
+                lift = new Lift(this);              // PENDING
+                coneManipulator = new ConeManipulator(this);   // DONE
+                //imu = new IMU(this);
+                t265 = new T265(hwMap);
+                //Jameson2Turnt = new Jimmy(this);
+                rearCamera = new RearCamera(this);
+
+                subsystems = new Subsystem[] {driveTrain, intake, lift, rearCamera, coneManipulator};
+                break;
+            case 1: // TeleOp
+                driveTrain = new DriveTrain(this);
+                intake = new Intake(this);
+                lift = new Lift(this);
+                coneManipulator = new ConeManipulator(this);
+                //Jameson2Turnt = new Jimmy(this);
+
+                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
+                //subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, poleDetection};
+                break;
+            case 2: // Testing
+                break;
+
         }
 
+    }
+
+    public Telemetry getTelemetry() {
+        return telemetry;
     }
 
     public double trackWidth() {
@@ -101,7 +115,7 @@ public class Robot {
     }
 
     public void setStartPosition(Pose2D start) {
-        //localizer.setStartPosition(start);
+        t265.setStartPosition(start);
         imu.setStartHeading(start.heading);
     }
 

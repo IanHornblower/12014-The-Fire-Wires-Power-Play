@@ -35,6 +35,7 @@ public class ConeManipulator implements Subsystem {
     public TeleOpAction raiseToTop;
     public TeleOpAction raiseToMid;
     public TeleOpAction raiseToLow;
+    public TeleOpAction raiseToGround;
 
     Robot robot;
 
@@ -54,17 +55,19 @@ public class ConeManipulator implements Subsystem {
        grabCone = new TeleOpAction(robot);
        dropConeAndReturn = new TeleOpAction(robot);
        raiseToTop = new TeleOpAction(robot);
+       raiseToMid = new TeleOpAction(robot);
        raiseToLow = new TeleOpAction(robot);
-       raiseToLow = new TeleOpAction(robot);
+       raiseToGround = new TeleOpAction(robot);
     }
 
     public enum V4BPreset {
         IN_MOST(0.85, 0.04),
         INNER_PRIME(0.75, 0.15),
         Vertiacal(0.44, 0.45),
-        //DROP(0.3, 0.55),
-        DROP(0.2, 0.68),
-        GROUND_LEVEL(0.02, 0.86);
+        DROP(0.35, 0.55),
+        //DROP(0.2, 0.68), OLD
+        GROUND_LEVEL(0.05, 0.84);
+        //GROUND_LEVEL(0.02, 0.86); OLD
 
         double left, right;
 
@@ -126,40 +129,47 @@ public class ConeManipulator implements Subsystem {
 
     private void dropConeAndReturnInit() {
         dropConeAndReturn.addAction(new CustomAction(()-> robot.coneManipulator.open()));
-        dropConeAndReturn.addWait(0.2);
+        dropConeAndReturn.addWait(0.3);
         dropConeAndReturn.addAction(new CustomAction(()-> setPosition(V4BPreset.INNER_PRIME)));
         dropConeAndReturn.addAction(new LiftSetPosition(robot, Lift.lowResting));
-        //dropConeAndReturn.addAction(new CustomAction(()-> robot.lift.setPower(-0.1)));
-        //dropConeAndReturn.addWait(0.3);
-        //dropConeAndReturn.addAction(new CustomAction(()-> robot.lift.setPower(0)));
     }
 
     private void raiseToTopInit() {
+        raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
         raiseToTop.addAction(new LiftSetPosition(robot, Lift.highPole));
         raiseToTop.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
-
     }
 
     private void raiseToMidInit() {
+        raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
         raiseToMid.addAction(new LiftSetPosition(robot, Lift.middlePole));
         raiseToMid.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
     }
 
     private void raiseToLowInit() {
+        raiseToLow.addCustomAction(()-> robot.coneManipulator.close());
         raiseToLow.addAction(new LiftSetPosition(robot, Lift.smallPole));
         raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
+    }
+
+    private void raiseToGround() {
+        raiseToGround.addCustomAction(()-> robot.coneManipulator.setPosition(V4BPreset.GROUND_LEVEL));
     }
 
     private void initActions() {
         grabConeInit();
         dropConeAndReturnInit();
+        raiseToLowInit();
+        raiseToMidInit();
+        raiseToTopInit();
+        raiseToGround();
     }
 
     @Override
     public void init() throws InterruptedException {
         initActions();
 
-        actions = new TeleOpAction[] {grabCone, dropConeAndReturn, raiseToTop, raiseToMid, raiseToLow};
+        actions = new TeleOpAction[] {grabCone, dropConeAndReturn, raiseToTop, raiseToMid, raiseToLow, raiseToGround};
     }
 
     @Override

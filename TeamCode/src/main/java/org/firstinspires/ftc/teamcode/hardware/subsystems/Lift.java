@@ -5,8 +5,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorDigitalTouch;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 
@@ -15,15 +17,16 @@ public class Lift implements Subsystem {
 
     public DcMotorEx lower, upper;
     HardwareMap hwMap;
+    public DigitalChannel limitSwitch;
 
     public static double lowest = 0;
-    public static double lowResting = 0;
-    public static double smallPole = 0;
-    public static double middlePole = 0;
-    public static double highPole = 0;
+    public static double lowResting = 25;
+    public static double smallPole = 500;
+    public static double middlePole = 1350;
+    public static double highPole = 2200;
     public static double top = 2600;
 
-    public static double kP = 0.007;
+    public static double kP = 0.013;
 
     public static double feedfoward = 0.0;
 
@@ -33,6 +36,8 @@ public class Lift implements Subsystem {
 
         lower = hwMap.get(DcMotorEx.class, "lowerLift");
         upper = hwMap.get(DcMotorEx.class, "upperLift");
+
+        limitSwitch = hwMap.get(DigitalChannel.class, "lm");
     }
 
 
@@ -52,6 +57,10 @@ public class Lift implements Subsystem {
         setPower(error * kP);
     }
 
+    public boolean isLiftDown() {
+        return !limitSwitch.getState();
+    }
+
     public void setPower(double power) {
         lower.setPower(power);
         upper.setPower(power);
@@ -67,6 +76,8 @@ public class Lift implements Subsystem {
 
         upper.setDirection(DcMotorSimple.Direction.REVERSE);
         lower.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        limitSwitch.setMode(DigitalChannel.Mode.INPUT);
     }
 
     @Override

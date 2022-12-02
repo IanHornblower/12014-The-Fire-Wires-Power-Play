@@ -10,7 +10,7 @@ public abstract class Action {
 
     public abstract void startAction();
 
-    public abstract void runAction() throws InterruptedException;
+    public abstract void runAction() throws Exception;
 
     public abstract void stopAction();
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Actual;
 
+import android.util.Base64DataException;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -24,26 +26,13 @@ import java.util.ArrayList;
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
-    /**
-     * Finished - Intake
-     * In progress - Lift, V4B
-     * Un-started - Jimmy, Pole Detection
-     */
-
-
-
-    boolean autoGrabbing = false;
-
-    public static double position = 0;
-
     @Override
     public void runOpMode() throws InterruptedException {
-        // Make Telemetry Fancy
-        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
         // Setup Robot Hardware & Define OpMode Type
-        Robot rob = new Robot(hardwareMap, Robot.OPMODE_TYPE.TELEOP);
+        Robot rob = new Robot(hardwareMap, telemetry, Robot.OPMODE_TYPE.TELEOP);
+
+        // Fancify Telemetry
+        telemetry = rob.getTelemetry();
 
         // Init Robot
         rob.init();
@@ -55,7 +44,14 @@ public class TeleOp extends LinearOpMode {
         // Timer to switch between operator modes
         Timer profileTimer = new Timer();
         profileTimer.start();
-        boolean manualMode = true;
+        boolean manualMode = false;
+
+        Timer autoGrabTimer = new Timer();
+        autoGrabTimer.start();
+
+        Timer driveSpeedSelectTimer = new Timer();
+        driveSpeedSelectTimer.start();
+        double speed = 1.0;
 
         ActionSequenceRunner coneMinip = new ActionSequenceRunner(rob);
 
@@ -68,39 +64,113 @@ public class TeleOp extends LinearOpMode {
         while(opModeIsActive() && !isStopRequested()) {
 
             if(gamepad2.touchpad && profileTimer.currentSeconds() > 0.3) {
+                profileTimer.reset();
+                gamepad2.rumble(300);
                 manualMode = !manualMode;
             }
 
             if(manualMode) { // Put Manual shit
                 telemetry.addData("Operating Mode", Color.RED.format("Manual"));
-                gamepad2.setLedColor(255.0, 0.0, 0.0, 1);
-            }
-            else {           // Put Automatic shit
-                // Auto Grab Cone when thingy is there
-                if(rob.intake.hasCone() && !autoGrabbing) {
-                    rob.coneManipulator.grabCone.start();
-                    autoGrabbing = true;
+                gamepad2.setLedColor(255.0, 0.0, 0.0, 5000);
+
+                // Use DPad for setting lift position
+                /*
+                if(gamepad2.dpad_down) {
+                    rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.IN_MOST);
                 }
-                if(rob.coneManipulator.grabCone.isComplete()) {
-                    autoGrabbing = false;
+                if(gamepad2.dpad_left) {
+                    rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
+                }
+                if(gamepad2.dpad_up) {
+                    rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.Vertiacal);
+                }
+                if(gamepad2.dpad_right) {
+                    rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
                 }
 
-                telemetry.addData("Operating Mode", Color.BLUE.format("Automatic"));
-                gamepad2.setLedColor(0.0, 0.0, 255.0, 1);
+                // Close and Open the Claw
+                // X/Square -> Open
+                // B/Circle -> Close
+                if(gamepad2.x) {
+                    rob.coneManipulator.open();
+                }
+                if(gamepad2.b) {
+                    rob.coneManipulator.close();
+                }
+
+                 */
+
+
+
+
+
             }
+            else {
+                // Put Automatic shit
+                // Auto Grab Cone when thingy is there
+
+                telemetry.addData("Operating Mode", Color.GREEN.format("Automatic"));
+                gamepad2.setLedColor(0.0, 255.0, 0.0, 5000);
+
+                // Automatically Grab Cone if it is in the proper position
+
+                //if(rob.intake.hasCone() && rob.lift.isLiftDown()) {
+                //    rob.coneManipulator.grabCone.start();
+                //    autoGrabTimer.reset();
+                //}
+
+                rob.coneManipulator.raiseToGround.start(()-> gamepad2.dpad_down); // GROUND
+
+                rob.coneManipulator.raiseToTop.start(()-> gamepad2.dpad_right); // TOP
+
+                rob.coneManipulator.raiseToMid.start(()-> gamepad2.dpad_up); // MID
+
+                rob.coneManipulator.raiseToLow.start(()-> gamepad2.dpad_left); // LOW
+
+
+
+            }
+
+            // Lift - Gamepad 2
+            //double liftPower = (1 * gamepad2.right_trigger) + (-0.7 * gamepad2.left_trigger);
+
+            //rob.lift.setPower(liftPower);
+
+            // Right Bumper - Grab and Prime Cone
+            rob.coneManipulator.grabCone.start(()-> gamepad2.right_bumper);
+
+            // Left Bumper - Release and Lower lift
+            rob.coneManipulator.dropConeAndReturn.start(()-> gamepad2.left_bumper);
+
+
+
+
+            /*
+             * Game Pad 1 - Driver
+             */
 
             /*
              * Intake - Gamepad 1
              *
-             * Control Schema (Change to triggers later || to allow for triggers for V4B or Claw)
-             *      - Left Bumper - Reversed Intake
-             *      - Right Bumper - Regular Intake
+             * Control Schema
+             *      - Left Trigger - Reversed Intake
+             *      - Right Trigger - Regular Intake
              *      - When not pressed - Is Stopped
              */
 
             if(gamepad1.right_trigger > 0.1) rob.intake.start();
             else if (gamepad1.left_trigger > 0.1) rob.intake.reverse();
             else rob.intake.stop();
+
+            if(gamepad1.left_bumper && driveSpeedSelectTimer.currentSeconds() > 0.2) {
+                speed -= 0.2;
+                driveSpeedSelectTimer.reset();
+            }
+
+            if(gamepad1.right_bumper && driveSpeedSelectTimer.currentSeconds() > 0.2) {
+                speed += 0.2;
+                driveSpeedSelectTimer.reset();
+            }
 
             /*
              * Drive Train - Gamepad 1
@@ -110,54 +180,26 @@ public class TeleOp extends LinearOpMode {
              *      - When not pressed - Do not move
              */
 
-            rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
-
-            // Lift - Gamepad 2
-
-            double liftPower = (0.7 * gamepad2.right_trigger) + (-0.7 * gamepad2.left_trigger);
-
-            //rob.lift.setPower(liftPower);
-
-            rob.lift.runToPosition(position);
+            rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x*speed, -gamepad1.left_stick_y*speed, gamepad1.right_stick_x*speed);
 
 
-
-
-
-
-
-
-
-            // V4B
-
-            if(gamepad2.dpad_down) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.IN_MOST);
+            telemetry.addLine(Color.WHITE.format("---------------MATCH DATA----------------"));
+            if(rob.intake.hasCone()) {
+                telemetry.addLine(Color.GREEN.format("HAS CONE"));
+                telemetry.addData("Detector Distance", Color.GREEN.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
             }
-            if(gamepad2.dpad_left) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
+            else {
+                telemetry.addLine(Color.RED.format("NO CONE"));
+                telemetry.addData("Detector Distance", Color.RED.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
             }
-            if(gamepad2.dpad_up) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.Vertiacal);
-            }
-            if(gamepad2.dpad_right) {
-                rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
-            }
+            telemetry.addData("Drive Speed", speed);
 
-            // Claw
+            telemetry.addLine(Color.WHITE.format("---------------DEBUG----------------"));
 
-            if(gamepad2.x) {
-                rob.coneManipulator.open();
-            }
-            if(gamepad2.b) {
-                rob.coneManipulator.close();
-            }
-
-            rob.coneManipulator.grabCone.start(()-> gamepad1.right_bumper);
-
-            // Telemetry
-
+            telemetry.addData("Lift Power", rob.lift.lower.getPower());
+            telemetry.addData("Limit Switch", rob.lift.isLiftDown());
             telemetry.addData("Lift Encoder", rob.lift.getEncoderPosition());
-            telemetry.addData("Detector Distance", rob.intake.detector.getDistance(DistanceUnit.MM));
+            telemetry.addData("Grab Cone Status", rob.coneManipulator.grabCone.isComplete());
             telemetry.update();
 
             // Robot Update Call

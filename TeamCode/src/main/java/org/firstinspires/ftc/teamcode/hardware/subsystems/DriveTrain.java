@@ -33,7 +33,7 @@ public class DriveTrain implements Subsystem {
 
     HardwareMap hwMap;
 
-    //public MecanumLocalizer localizer;
+    //public Localizer localizer;
 
     public DriveTrain(Robot robot) {
         hwMap = robot.hwMap;
@@ -45,7 +45,7 @@ public class DriveTrain implements Subsystem {
         motors = new DcMotorEx[] {frontLeft, frontRight, backLeft, backRight};
 
 
-        //localizer = new MecanumLocalizer(robot);
+        //localizer = new Localizer(robot);
     }
 
     public HardwareMap getHardwareMap() {

@@ -12,7 +12,7 @@ public class LiftSetPosition extends Action {
     Robot robot;
     double position;
 
-    public static double tolerance = 10;
+    public static double tolerance = 50;
     public static double zeroMovementPower = 0.05;
 
     double kP = Lift.kP;
@@ -32,12 +32,9 @@ public class LiftSetPosition extends Action {
     @Override
     public void runAction() throws InterruptedException {
         error = position - robot.lift.getEncoderPosition();
-
-        robot.lift.setPower(error * kP);
+        robot.lift.runToPosition(position);
 
         isComplete = Math.abs(error) < tolerance;
-        isComplete = Math.abs(error * kP) < zeroMovementPower;
-        //isComplete = Math.abs(error) < tolerance || robot.lift.limitSwitchPressed();
     }
 
     @Override

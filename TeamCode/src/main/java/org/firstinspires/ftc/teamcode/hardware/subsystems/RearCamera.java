@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.security.PublicKey;
 
-public class SleeveDetectionCamera implements Subsystem {
+public class RearCamera implements Subsystem {
 
     public SleeveDetection sleeveDetection;
     public OpenCvCamera camera;
@@ -28,7 +28,8 @@ public class SleeveDetectionCamera implements Subsystem {
     OpenCvCameraRotation cameraRotation = OpenCvCameraRotation.UPSIDE_DOWN;
     public SleeveDetection.ParkingPosition position = SleeveDetection.ParkingPosition.LEFT;
 
-    public SleeveDetectionCamera(Robot robot) {
+
+    public RearCamera(Robot robot) {
         int cameraMonitorViewId = robot.hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", robot.hwMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(robot.hwMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
         sleeveDetection = new SleeveDetection();

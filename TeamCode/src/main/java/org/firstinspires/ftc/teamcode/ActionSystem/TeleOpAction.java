@@ -48,7 +48,7 @@ public class TeleOpAction {
     }
 
     public boolean isComplete() {
-        return isComplete;
+        return getActionList().get(getActionList().size()-1).isComplete;
     }
 
     public void reset() {

@@ -7,7 +7,7 @@ import com.acmerobotics.roadrunner.localization.Localizer
 import com.acmerobotics.roadrunner.util.Angle
 import org.firstinspires.ftc.teamcode.hardware.Robot
 
-class MecanumLocalizer @JvmOverloads constructor(
+class Localizer @JvmOverloads constructor(
         private val drive: Robot,
         private val useExternalHeading: Boolean = true
 ) : Localizer {
