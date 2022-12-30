@@ -1,18 +1,19 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.Trajectory;
-import org.firstinspires.ftc.teamcode.control.TrajectoryDrawUtil;
+import org.firstinspires.ftc.teamcode.control.DashboardDrawUtil;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.math.Point;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.util.Color;
 
+@Disabled
 @TeleOp
 public class TrajectoryTesting extends LinearOpMode {
     @Override
@@ -26,7 +27,7 @@ public class TrajectoryTesting extends LinearOpMode {
         trajectory.add(new Point(24, 48));
         trajectory.add(new Point(45, 50));
 
-        TelemetryPacket tp = TrajectoryDrawUtil.drawTrajectory(trajectory, new TelemetryPacket());
+        TelemetryPacket tp = DashboardDrawUtil.drawTrajectory(trajectory, new TelemetryPacket());
         FtcDashboard.getInstance().sendTelemetryPacket(tp);
 
         waitForStart();

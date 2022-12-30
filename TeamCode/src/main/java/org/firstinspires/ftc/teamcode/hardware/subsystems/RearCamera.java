@@ -1,23 +1,21 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamServer;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.util.Color;
-import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
+import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.security.PublicKey;
-
 public class RearCamera implements Subsystem {
 
-    public SleeveDetection sleeveDetection;
+    public CombinedTracker combinedTracker;
     public OpenCvCamera camera;
 
     // Name of the Webcam to be set in the config
@@ -26,14 +24,14 @@ public class RearCamera implements Subsystem {
     int resWidth = 320;
     int resHeight = 240;
     OpenCvCameraRotation cameraRotation = OpenCvCameraRotation.UPSIDE_DOWN;
-    public SleeveDetection.ParkingPosition position = SleeveDetection.ParkingPosition.LEFT;
+    public CombinedTracker.ParkingPosition position = CombinedTracker.ParkingPosition.LEFT;
 
-
-    public RearCamera(Robot robot) {
-        int cameraMonitorViewId = robot.hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", robot.hwMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(robot.hwMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetection();
-        camera.setPipeline(sleeveDetection);
+    public RearCamera(Robot robot, HardwareMap hwMap) {
+        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
+        combinedTracker = new CombinedTracker();
+        combinedTracker.setTrackType(CombinedTracker.TrackType.SLEEVE);
+        camera.setPipeline(combinedTracker);
     }
 
     public OpenCvCamera getCamera() {
@@ -54,12 +52,16 @@ public class RearCamera implements Subsystem {
         cameraRotation = rotation;
     }
 
-    public SleeveDetection.ParkingPosition getPosition() {
-        return position;
+    public double getObjectError() {
+        return combinedTracker.getConeError();
+    }
+
+    public CombinedTracker.ParkingPosition getSleeveLocation() {
+        return combinedTracker.getSleevePosition();
     }
 
     public String getTelemetry() {
-        switch (position) {
+        switch (getSleeveLocation()) {
             case LEFT:
                 return Color.NO_COLOR.format("Sleeve Detection: ") + Color.YELLOW.format("LEFT");
             case CENTER:
@@ -89,6 +91,5 @@ public class RearCamera implements Subsystem {
 
     @Override
     public void update() throws InterruptedException {
-        position = sleeveDetection.getPosition();
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Testing;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.util.Color;
 
-@Disabled
-@TeleOp
+@Config
+@TeleOp(name = "Manual Lift Control")
 public class Testing extends LinearOpMode {
 
 
@@ -23,7 +23,7 @@ public class Testing extends LinearOpMode {
     // Minip
 
     public static double intakeSpeed = 0.0;
-    public static double liftSpeed = 0.5;
+    public static double liftSpeed = 1;
 
     public static double left = 1;
     public static double right = 0.09;
@@ -64,10 +64,10 @@ public class Testing extends LinearOpMode {
                 rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
             }
 
-            if(gamepad1.x) {
+            if(gamepad1.square) {
                 rob.coneManipulator.open();
             }
-            if(gamepad1.b) {
+            if(gamepad1.circle) {
                 rob.coneManipulator.close();
             }
 

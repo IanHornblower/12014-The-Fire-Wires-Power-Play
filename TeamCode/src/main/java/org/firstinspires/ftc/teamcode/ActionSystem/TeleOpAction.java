@@ -76,12 +76,12 @@ public class TeleOpAction {
         held_down = true;
     }
 
-    public void run() throws Exception {
-        if(bool.getAsBoolean() && !start && timer.currentSeconds() > 0.2) {
+    public void run() throws InterruptedException {
+        if(bool != null && bool.getAsBoolean() && !start && timer.currentSeconds() > 0.4) {
             start = true;
             timer.reset();
         }
-        else if (bool.getAsBoolean() && !isComplete && start && timer.currentSeconds() > 0.2) {
+        else if (bool != null && bool.getAsBoolean() && !isComplete && start && timer.currentSeconds() > 0.4) {
             currentState = 0;
             start = false;
             reset();

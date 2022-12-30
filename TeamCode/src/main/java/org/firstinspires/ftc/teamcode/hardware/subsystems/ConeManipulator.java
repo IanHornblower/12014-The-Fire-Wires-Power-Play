@@ -7,12 +7,14 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequence;
 import org.firstinspires.ftc.teamcode.ActionSystem.TeleOpAction;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.CustomAction;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.LiftSetPosition;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.Wait;
+import org.firstinspires.ftc.teamcode.ActionSystem.actions.WaitFor;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 
@@ -26,8 +28,8 @@ public class ConeManipulator implements Subsystem {
     ServoImplEx rightS;
 
 
-    public static double grabberOpen = 0.5;
-    public static double grabberClose = 0.3 ;
+    public static double grabberOpen = 0.4;
+    public static double grabberClose = 0.25;
 
     public TeleOpAction[] actions;
     public TeleOpAction grabCone;
@@ -64,10 +66,10 @@ public class ConeManipulator implements Subsystem {
         IN_MOST(0.85, 0.04),
         INNER_PRIME(0.75, 0.15),
         Vertiacal(0.44, 0.45),
-        DROP(0.35, 0.55),
-        //DROP(0.2, 0.68), OLD
+        DROP_AUTO(0.35, 0.55),
+        DROP(0.4, 0.5),
+        STRIGHT_OUT(0.2, 0.33),
         GROUND_LEVEL(0.05, 0.84);
-        //GROUND_LEVEL(0.02, 0.86); OLD
 
         double left, right;
 
@@ -125,6 +127,7 @@ public class ConeManipulator implements Subsystem {
         grabCone.addAction(new CustomAction(this::close));
         grabCone.addWait(0.2);
         grabCone.addAction(new CustomAction(()-> setPosition(ConeManipulator.V4BPreset.Vertiacal)));
+        grabCone.addWait(0.3);
     }
 
     private void dropConeAndReturnInit() {
@@ -136,20 +139,21 @@ public class ConeManipulator implements Subsystem {
 
     private void raiseToTopInit() {
         raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
+        raiseToTop.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
         raiseToTop.addAction(new LiftSetPosition(robot, Lift.highPole));
-        raiseToTop.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
     }
 
     private void raiseToMidInit() {
         raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
+        raiseToMid.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
         raiseToMid.addAction(new LiftSetPosition(robot, Lift.middlePole));
-        raiseToMid.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
     }
 
     private void raiseToLowInit() {
         raiseToLow.addCustomAction(()-> robot.coneManipulator.close());
+        raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
+        //raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
         raiseToLow.addAction(new LiftSetPosition(robot, Lift.smallPole));
-        raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP));
     }
 
     private void raiseToGround() {
@@ -173,7 +177,7 @@ public class ConeManipulator implements Subsystem {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() throws InterruptedException {
         for(TeleOpAction action : actions) {
             action.run();
         }

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.util.Timer;
 
 public class IMU implements Subsystem {
 
@@ -17,6 +18,8 @@ public class IMU implements Subsystem {
     Orientation angles;
 
     AxesOrder HubConfig = AxesOrder.ZYX;
+
+    public float velocity = 0.0F;
 
     double previousHeading = 0.0;
     double accumulatedHeading = 0.0;
@@ -27,7 +30,7 @@ public class IMU implements Subsystem {
     double startHeading = 0.0;
 
     public IMU(Robot robot) {
-        robot.hwMap = hwMap;
+        this.hwMap = robot.hwMap;
     }
 
     public void setStartHeading(double heading) {
@@ -50,7 +53,7 @@ public class IMU implements Subsystem {
     }
 
     public Double getExternalHeadingVelocity() {
-        return (double) imu.getAngularVelocity().zRotationRate;
+        return (double) -imu.getAngularVelocity().zRotationRate;
     }
 
     public double getHeadingInRadians() {
@@ -88,12 +91,16 @@ public class IMU implements Subsystem {
         return Math.acos(x1*x2 + y1*y2);
     }
 
+    Timer timer = new Timer();
+
     @Override
     public void init() throws InterruptedException {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;  // :)
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        timer.start();
     }
 
     @Override
@@ -102,6 +109,8 @@ public class IMU implements Subsystem {
         normalHeading = correctAngle(rawHeading);
 
         double dHeading = rawHeading - previousHeading;
+
+        velocity = (float) dHeading / (float) timer.currentSeconds();
 
         if (dHeading < -Math.PI) {
             dHeading += Math.PI * 2;

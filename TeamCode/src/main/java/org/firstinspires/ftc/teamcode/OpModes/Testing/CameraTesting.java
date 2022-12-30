@@ -1,35 +1,30 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Testing;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamServer;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
-//@Config
-//@TeleOp
-@Disabled
+@Config
+@TeleOp
 public class CameraTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
-        telemetry.setItemSeparator(" >> ");
-
         Robot rob = new Robot(hardwareMap, telemetry, Robot.OPMODE_TYPE.AUTO);
-
-        FtcDashboard.getInstance().startCameraStream(rob.rearCamera.camera, 0);
-        CameraStreamServer.getInstance().setSource(rob.rearCamera.camera);
-
         rob.init();
+
+        rob.FtcDashboardInstance.startCameraStream(rob.rearCamera.camera, 0);
+        CameraStreamServer.getInstance().setSource(rob.rearCamera.camera);
 
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()) {
 
-            telemetry.addLine(rob.rearCamera.getTelemetry());
+
+            telemetry.addData("Cone Error", rob.rearCamera.getObjectError());
 
             try {
                 rob.update();

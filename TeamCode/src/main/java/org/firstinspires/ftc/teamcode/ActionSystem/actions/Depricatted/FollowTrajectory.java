@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.ActionSystem.actions;
+package org.firstinspires.ftc.teamcode.ActionSystem.actions.Depricatted;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.ActionSystem.Action;
 import org.firstinspires.ftc.teamcode.control.PurePursuit;
 import org.firstinspires.ftc.teamcode.control.Trajectory;
-import org.firstinspires.ftc.teamcode.control.TrajectoryDrawUtil;
+import org.firstinspires.ftc.teamcode.control.DashboardDrawUtil;
 import org.firstinspires.ftc.teamcode.math.Point;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
@@ -32,19 +32,19 @@ public class FollowTrajectory extends Action {
 
     @Override
     public void startAction() {
-        FtcDashboard.getInstance().sendTelemetryPacket(TrajectoryDrawUtil.drawTrajectory(trajectory, new TelemetryPacket()));
+        FtcDashboard.getInstance().sendTelemetryPacket(DashboardDrawUtil.drawTrajectory(trajectory, new TelemetryPacket()));
 
         extendedPath = new Trajectory(PurePursuit.extendPath(trajectory.getPath(), radius));
         timer.start();
     }
 
-    public static double turnP = 2;
-    public static double forwardP = 0.09;
+    public static double turnP = 0.06;
+    public static double forwardP = 0.06;
 
     // Suplement the solute of F & T from P Control Loop to Velo Graph
 
     @Override
-    public void runAction() throws Exception {
+    public void runAction() throws InterruptedException {
         robot.update();
         Pose2D pose = robot.t265.getPose();
         Point lookAhead = PurePursuit.getLookAheadPoint(trajectory.getPath(), pose, radius);
@@ -67,7 +67,7 @@ public class FollowTrajectory extends Action {
 
         robot.driveTrain.setMotorPowers(left, right);
 
-        isComplete = timer.currentSeconds() > 0.5 && robot.driveTrain.motors[0].getPower() < 0.05;
+        isComplete = Math.abs(error.x + error.y) < 2;
     }
 
     @Override

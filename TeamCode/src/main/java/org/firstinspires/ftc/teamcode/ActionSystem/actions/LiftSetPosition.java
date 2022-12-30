@@ -6,7 +6,6 @@ import org.firstinspires.ftc.teamcode.ActionSystem.Action;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
 
-@Config
 public class LiftSetPosition extends Action {
 
     Robot robot;

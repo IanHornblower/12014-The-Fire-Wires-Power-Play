@@ -9,6 +9,10 @@ public class WaitFor extends Action {
     BooleanSupplier value;
     Runnable runnable;
 
+    public WaitFor(BooleanSupplier value) {
+        this.value = value;
+    }
+
     public WaitFor(BooleanSupplier value, Runnable runnable) {
         this.runnable = runnable;
         this.value = value;
@@ -16,7 +20,6 @@ public class WaitFor extends Action {
 
     @Override
     public void startAction() {
-
     }
 
     @Override
@@ -26,6 +29,8 @@ public class WaitFor extends Action {
 
     @Override
     public void stopAction() {
-        runnable.run();
+        if(runnable != null) {
+            runnable.run();
+        }
     }
 }

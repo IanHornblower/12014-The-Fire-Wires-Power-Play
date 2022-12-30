@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.apache.commons.math3.util.IterationListener;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.math.Point;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 
 @Config
@@ -32,11 +33,13 @@ public class DriveTrain implements Subsystem {
     public DcMotorEx[] motors;
 
     HardwareMap hwMap;
+    Robot robot;
 
     //public Localizer localizer;
 
     public DriveTrain(Robot robot) {
         hwMap = robot.hwMap;
+        this.robot = robot;
         frontLeft = hwMap.get(DcMotorEx.class, "fl"); // should be fl
         frontRight = hwMap.get(DcMotorEx.class, "fr");
         backLeft = hwMap.get(DcMotorEx.class, "bl");
@@ -95,6 +98,11 @@ public class DriveTrain implements Subsystem {
         double br = power * Math.cos(angle) - Math.toRadians(k * t) * (maxAngularVelocity / maxVelocity);
 
         setMotorPowers(fl, fr, bl, br);
+    }
+
+    public void driveFieldCentric(double x, double y, double h) {
+        Point power = new Point(x, y).rotate(robot.imu.getHeadingInRadians());
+        setMotorPowers(power.x, power.y, h);
     }
 
     public void setMotorPowers(double fl, double fr, double bl, double br) {

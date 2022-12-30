@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorDigitalTouch;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 
@@ -23,7 +22,7 @@ public class Lift implements Subsystem {
     public static double lowResting = 25;
     public static double smallPole = 500;
     public static double middlePole = 1350;
-    public static double highPole = 2200;
+    public static double highPole = 1950;
     public static double top = 2600;
 
     public static double kP = 0.013;
@@ -76,6 +75,9 @@ public class Lift implements Subsystem {
 
         upper.setDirection(DcMotorSimple.Direction.REVERSE);
         lower.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         limitSwitch.setMode(DigitalChannel.Mode.INPUT);
     }

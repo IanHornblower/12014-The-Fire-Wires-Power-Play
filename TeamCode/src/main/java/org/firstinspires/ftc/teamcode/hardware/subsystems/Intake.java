@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.outoftheboxrobotics.photoncore.Neutrino.RevColorSensor.RevColorSensorV3Ex;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -18,11 +19,11 @@ import kotlin.text.CharDirectionality;
 public class Intake implements Subsystem {
 
     DcMotor left, right;
-    public RevColorSensorV3 detector;
+    public RevColorSensorV3Ex detector;
     double left_p, right_p;
     public static double multiplier = 1;
     public static double speed = 0.6;
-    public static double coneThreshold = 30;
+    public static double coneThreshold = 40;
     public ActionSequenceRunner actionRunner;
 
     public Intake(Robot robot) {
@@ -31,7 +32,7 @@ public class Intake implements Subsystem {
         left = hwMap.get(DcMotor.class, "leftIntake");
         right = hwMap.get(DcMotor.class, "rightIntake");
 
-        detector = hwMap.get(RevColorSensorV3.class, "detector");
+        detector = hwMap.get(RevColorSensorV3Ex.class, "detector");
     }
 
     public void start() {

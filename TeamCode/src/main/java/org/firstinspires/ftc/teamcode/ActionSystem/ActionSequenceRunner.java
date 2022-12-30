@@ -28,12 +28,18 @@ public class ActionSequenceRunner {
         this.actionList = actionSequence.getActionList();
     }
 
+    public boolean isActionComplete(int i) {
+        return actionList.get(i).isComplete;
+    }
+
     public void update() throws Exception {
+        // Run initialization code once
         if (!hasStartedAction) {
             actionList.get(currentState).startAction();
             hasStartedAction = true;
         }
 
+        // Run through each of the actions after the previous action has completed
         if (actionList.get(currentState).isActionComplete() && currentState < actionList.size() - 1) {
             actionList.get(currentState).stopAction();
             currentState += 1;
@@ -41,6 +47,8 @@ public class ActionSequenceRunner {
                 currentPersistentAction = actionList.get(currentState);
             }
             hasStartedAction = false;
+
+        // Stop Action if the required criteria is reached
         } else if (actionList.get(currentState).isActionComplete() && currentState == actionList.size() - 1) {
             actionList.get(currentState).stopAction();
             isComplete = true;
@@ -48,6 +56,7 @@ public class ActionSequenceRunner {
             actionList.get(currentState).runAction();
         }
 
+        // If the action is persistent continue it running
         if (currentPersistentAction != null
                 && (!actionList.get(currentState).isActionPersistent()
                 || currentState == actionList.size() - 1) && hasStartedAction
