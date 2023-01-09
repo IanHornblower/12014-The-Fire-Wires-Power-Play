@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.OpModes.Testing;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.profile.MotionProfile;
+import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
+import com.acmerobotics.roadrunner.profile.MotionState;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,6 +18,7 @@ public class CameraTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot rob = new Robot(hardwareMap, telemetry, Robot.OPMODE_TYPE.AUTO);
         rob.init();
+
 
         rob.FtcDashboardInstance.startCameraStream(rob.rearCamera.camera, 0);
         CameraStreamServer.getInstance().setSource(rob.rearCamera.camera);
