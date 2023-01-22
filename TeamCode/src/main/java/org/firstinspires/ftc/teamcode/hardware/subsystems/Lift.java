@@ -16,18 +16,28 @@ public class Lift implements Subsystem {
 
     public DcMotorEx lower, upper;
     HardwareMap hwMap;
-    public DigitalChannel limitSwitch;
+//    public DigitalChannel limitSwitch;
 
     public static double lowest = 0;
     public static double lowResting = 25;
-    public static double smallPole = 500;
-    public static double middlePole = 1350;
-    public static double highPole = 1950;
+    public static double smallPole = 540;
+    public static double middlePole = 1140;
+    public static double highPole = 1600;
     public static double top = 2600;
 
-    public static double kP = 0.013;
+    public static double kP = 0.005;
+    public static double feedfoward = 0.0001;
+    public double position = 0;
 
-    public static double feedfoward = 0.0;
+    public boolean manueal = false;
+
+    public void setModeManuel() {
+        manueal = true;
+    }
+
+    public void setModeAutomatic() {
+        manueal = false;
+    }
 
 
     public Lift(Robot robot) {
@@ -36,33 +46,49 @@ public class Lift implements Subsystem {
         lower = hwMap.get(DcMotorEx.class, "lowerLift");
         upper = hwMap.get(DcMotorEx.class, "upperLift");
 
-        limitSwitch = hwMap.get(DigitalChannel.class, "lm");
+        //limitSwitch = hwMap.get(DigitalChannel.class, "lm");
     }
 
 
-    public void setPosition(double power, double position, double tolerance) {
-        double multiplier = Math.signum(position - getEncoderPosition());
+    public void runToPosition(double position) {
+        double error = position - getEncoderPosition();
 
-        setPower(power * multiplier);
+        if(error > 0) {
+            setPower(error * kP + position * feedfoward);
+        }
+        else if(error < 0 && position > 200) {
+            setPower(-0.2);
+        }
+        else if(error < 0 && position < 200 && getEncoderPosition() > 0) {
+            setPower(-0.1);
+        }
+        else {
+            setPower(0.0);
+        }
     }
 
     public double getEncoderPosition() {
         return lower.getCurrentPosition();
     }
 
-    public void runToPosition(double position) {
-        double error = position - getEncoderPosition();
+    public void setPosition(double position) {
+        this.position = position;
 
-        setPower(error * kP);
     }
 
     public boolean isLiftDown() {
-        return !limitSwitch.getState();
+        //return !limitSwitch.getState();
+        return Math.abs(getEncoderPosition()) < 100;
     }
 
     public void setPower(double power) {
         lower.setPower(power);
         upper.setPower(power);
+    }
+
+    double manPower = 0.0;
+    public void setManuealPower(double power) {
+        manPower = power;
     }
 
     @Override
@@ -73,17 +99,23 @@ public class Lift implements Subsystem {
         upper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lower.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        upper.setDirection(DcMotorSimple.Direction.REVERSE);
-        lower.setDirection(DcMotorSimple.Direction.REVERSE);
+        //upper.setDirection(DcMotorSimple.Direction.REVERSE);
+        //lower.setDirection(DcMotorSimple.Direction.REVERSE);
 
         upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        limitSwitch.setMode(DigitalChannel.Mode.INPUT);
+        //limitSwitch.setMode(DigitalChannel.Mode.INPUT);
     }
 
     @Override
     public void update() throws InterruptedException {
+        if(!manueal) {
+            runToPosition(position);
+        }
+        else {
+            setPower(manPower);
+        }
     }
 
 

@@ -10,6 +10,7 @@ import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
@@ -18,13 +19,15 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.IMU;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Jimmy;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.LineAlignment;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.RearCamera;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.T265;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class Robot {
     public DriveTrain driveTrain;
@@ -35,13 +38,15 @@ public class Robot {
     public IMU imu;
     public T265 t265;
     public RearCamera rearCamera;
-    public LineAlignment lineAlignment;
+    public StandardTrackingWheelLocalizer localizer;
 
     public final FtcDashboard FtcDashboardInstance = FtcDashboard.getInstance();
 
     Telemetry telemetry;
 
     public HardwareMap hwMap;
+
+    public BooleanSupplier tempSideFlip = ()-> false;
 
     public Subsystem[] subsystems = {};
 
@@ -73,21 +78,20 @@ public class Robot {
                 intake = new Intake(this);
                 lift = new Lift(this);
                 coneManipulator = new ConeManipulator(this);
-                imu = new IMU(this);
-                lineAlignment = new LineAlignment(this);
+                //imu = new IMU(this);
+                //localizer = new StandardTrackingWheelLocalizer(this);
                 rearCamera = new RearCamera(this, hwMap);
 
-                subsystems = new Subsystem[] {driveTrain, intake, lift, rearCamera, coneManipulator, imu, lineAlignment};
+                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, localizer, rearCamera};
                 break;
             case 1: // TeleOp
                 driveTrain = new DriveTrain(this);
                 intake = new Intake(this);
                 lift = new Lift(this);
                 coneManipulator = new ConeManipulator(this);
-                imu = new IMU(this);
-                lineAlignment = new LineAlignment(this);
-                rearCamera = new RearCamera(this, hwMap);
-                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, imu, lineAlignment, rearCamera};
+                //localizer = new StandardTrackingWheelLocalizer(this);
+
+                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
                 break;
             case 2: // Testing
                 break;
@@ -150,7 +154,7 @@ public class Robot {
             subsystem.init();
         }
 
-        PhotonCore.enable();
+       // PhotonCore.enable();
     }
 
     public void update() throws InterruptedException {
@@ -160,4 +164,6 @@ public class Robot {
 
         //FtcDashboard.getInstance().sendTelemetryPacket(DashboardDrawUtil.drawRobot(t265.getPose(), new TelemetryPacket()));
     }
+
+
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.outoftheboxrobotics.photoncore.Neutrino.RevColorSensor.RevColorSensorV3Ex;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -18,21 +19,36 @@ import kotlin.text.CharDirectionality;
 @Config
 public class Intake implements Subsystem {
 
-    DcMotor left, right;
-    public RevColorSensorV3Ex detector;
-    double left_p, right_p;
+    CRServo bl, br, fr, fl;
     public static double multiplier = 1;
     public static double speed = 0.6;
     public static double coneThreshold = 40;
-    public ActionSequenceRunner actionRunner;
+
+    public RevColorSensorV3Ex front, back;
+
+
 
     public Intake(Robot robot) {
         HardwareMap hwMap = robot.hwMap;
 
-        left = hwMap.get(DcMotor.class, "leftIntake");
-        right = hwMap.get(DcMotor.class, "rightIntake");
+       bl = hwMap.get(CRServo.class, "bl_intake");
+       br = hwMap.get(CRServo.class, "br_intake");
+       fr = hwMap.get(CRServo.class, "fr_intake");
+       fl = hwMap.get(CRServo.class, "fl_intake");
 
-        detector = hwMap.get(RevColorSensorV3Ex.class, "detector");
+       front = hwMap.get(RevColorSensorV3Ex.class, "front");
+       back = hwMap.get(RevColorSensorV3Ex.class, "back");
+    }
+
+    public enum DIRECTION {
+        front,
+        back
+    }
+
+    public  DIRECTION direction = DIRECTION.front;
+
+    public void setDirection(DIRECTION d) {
+        direction = d;
     }
 
     public void start() {
@@ -48,12 +64,18 @@ public class Intake implements Subsystem {
     }
 
     public void setPower(double power) {
-        left_p = power * -multiplier;
-        right_p = power * multiplier;
+        bl.setPower(power);
+        br.setPower(-power);
+        fr.setPower(power);
+        fl.setPower(-power);
     }
 
     public boolean hasCone() {
-        return detector.getDistance(DistanceUnit.MM) < coneThreshold;
+        if(direction == DIRECTION.front) {
+            return back.getDistance(DistanceUnit.MM) < 35;
+        }else {
+            return front.getDistance(DistanceUnit.MM) < 35;
+        }
     }
 
     @Override
@@ -63,7 +85,6 @@ public class Intake implements Subsystem {
 
     @Override
     public void update() throws InterruptedException {
-        left.setPower(left_p);
-        right.setPower(right_p);
+
     }
 }

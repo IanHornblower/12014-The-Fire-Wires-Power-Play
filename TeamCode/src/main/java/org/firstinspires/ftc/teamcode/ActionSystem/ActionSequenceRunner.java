@@ -32,6 +32,10 @@ public class ActionSequenceRunner {
         return actionList.get(i).isComplete;
     }
 
+    public int getCurrentAction() {
+        return currentState + 1;
+    }
+
     public void update() throws Exception {
         // Run initialization code once
         if (!hasStartedAction) {

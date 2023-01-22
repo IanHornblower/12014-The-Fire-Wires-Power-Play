@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 
 public class Wait extends Action {
 
-    Timer timer;
+    Timer timer = new Timer();
     double seconds;
 
     public Wait(double seconds) {

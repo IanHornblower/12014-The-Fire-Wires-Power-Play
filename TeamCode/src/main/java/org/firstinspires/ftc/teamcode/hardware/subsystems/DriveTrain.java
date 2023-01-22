@@ -105,6 +105,11 @@ public class DriveTrain implements Subsystem {
         setMotorPowers(power.x, power.y, h);
     }
 
+    public void driveFieldCentric(double x, double y, double h, double modTheta) {
+        Point power = new Point(x, y).rotate(modTheta - robot.localizer.getPose().heading);
+        setMotorPowers(power.x, power.y, h);
+    }
+
     public void setMotorPowers(double fl, double fr, double bl, double br) {
         this.fl = fl;
         this.fr = fr;

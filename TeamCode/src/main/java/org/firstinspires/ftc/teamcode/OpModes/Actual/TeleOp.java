@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -27,8 +28,9 @@ import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 
 import java.util.ArrayList;
 
+@Disabled
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Old TeleOp")
 public class TeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -68,7 +70,7 @@ public class TeleOp extends LinearOpMode {
         }
 
         rob.coneManipulator.open();
-        rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
+        //rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
 
         while(opModeIsActive() && !isStopRequested()) {
 
@@ -158,7 +160,12 @@ public class TeleOp extends LinearOpMode {
 
             // Lift - Gamepad 2
 
-            //
+            // Con
+            // RIGHT - 4
+            // Lat - 5
+
+            // Ex
+            // left - 1/0
 
 
 
@@ -220,11 +227,11 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData(Color.WHITE.format("ROBOT SPEED"), Color.WHITE.format(speed));
             if(rob.intake.hasCone()) {
                 telemetry.addLine(Color.GREEN.format("HAS CONE"));
-                telemetry.addData("Detector Distance", Color.GREEN.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
+                //telemetry.addData("Detector Distance", Color.GREEN.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
             }
             else {
                 telemetry.addLine(Color.RED.format("NO CONE"));
-                telemetry.addData("Detector Distance", Color.RED.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
+                //telemetry.addData("Detector Distance", Color.RED.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
             }
 
             telemetry.addLine(Color.WHITE.format("---------------DEBUG----------------"));
@@ -234,9 +241,10 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Lift Encoder", rob.lift.getEncoderPosition());
             telemetry.addData("Front Left Value", rob.driveTrain.motors[0].getCurrentPosition());
             telemetry.addData("imu velo", Math.toDegrees(rob.imu.getExternalHeadingVelocity()));
-            telemetry.addData("Distacne", rob.lineAlignment.getDistance());
-            telemetry.addData("left color", rob.lineAlignment.getLeft());
-            telemetry.addData("right color", rob.lineAlignment.getRight());
+
+           // telemetry.addData("Distacne", rob.lineAlignment.getDistance());
+           // telemetry.addData("left color", rob.lineAlignment.getLeft());
+           // telemetry.addData("right color", rob.lineAlignment.getRight());
             telemetry.update();
 
             // Robot Update Call

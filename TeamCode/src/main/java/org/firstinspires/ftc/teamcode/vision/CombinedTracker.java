@@ -80,10 +80,10 @@ public class CombinedTracker extends OpenCvPipeline {
 
     // Width and height for the bounding box
     public static int REGION_WIDTH = 25;
-    public static int REGION_HEIGHT = 45;
+    public static int REGION_HEIGHT = 35;
 
     // Anchor Point
-    public static int anchorPointX = 160;
+    public static int anchorPointX = 182;
     public static int anchorPointY = 90;
 
     // TOPLEFT anchor point for the bounding box

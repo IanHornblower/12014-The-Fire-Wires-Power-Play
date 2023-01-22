@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode.ActionSystem;
 
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.CustomAction;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.Wait;
+import org.firstinspires.ftc.teamcode.ActionSystem.actions.WaitFor;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class ActionSequence {
 
@@ -33,6 +36,10 @@ public class ActionSequence {
 
     public void addWait(double seconds) {
         actionSequence.add(new Wait(seconds));
+    }
+
+    public void addWaitFor(BooleanSupplier supplier) {
+        actionSequence.add(new WaitFor(supplier));
     }
 
 }

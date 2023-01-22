@@ -13,7 +13,7 @@ public class BasicTurn extends Action {
     public BasicTurn(Robot robot, double referenceAngle) {
         this.robot = robot;
         this.referenceAngle = referenceAngle;
-        this.controller = new TurnOnlyControl(()-> robot.imu.getHeadingInRadians(),referenceAngle);
+        this.controller = new TurnOnlyControl(()-> robot.localizer.getPose().heading ,referenceAngle - Math.toRadians(180));
     }
 
     @Override
@@ -22,7 +22,7 @@ public class BasicTurn extends Action {
 
     @Override
     public void runAction() {
-        robot.driveTrain.setMotorPowers(controller.calculate().scalarMultiply(-1));
+        robot.driveTrain.setMotorPowers(controller.calculate().scalarMultiply(1));
         isComplete = Math.abs(controller.getEndGoalError()) < Math.toRadians(2);
                 //&& Math.abs(robot.imu.getAccel()) < Math.toRadians(10);
 

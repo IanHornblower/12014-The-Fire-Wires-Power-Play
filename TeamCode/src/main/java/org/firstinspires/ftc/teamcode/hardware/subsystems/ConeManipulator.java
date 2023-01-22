@@ -11,6 +11,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequence;
 import org.firstinspires.ftc.teamcode.ActionSystem.TeleOpAction;
+import org.firstinspires.ftc.teamcode.ActionSystem.actions.ConeTurn;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.CustomAction;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.LiftSetPosition;
 import org.firstinspires.ftc.teamcode.ActionSystem.actions.Wait;
@@ -28,8 +29,9 @@ public class ConeManipulator implements Subsystem {
     ServoImplEx rightS;
 
 
-    public static double grabberOpen = 0.4;
-    public static double grabberClose = 0.25;
+    public static double grabberOpen = 0.7;
+    public static double grabberTransfer = 0.42;
+    public static double grabberClose = 0.42;
 
     public TeleOpAction[] actions;
     public TeleOpAction grabCone;
@@ -38,6 +40,8 @@ public class ConeManipulator implements Subsystem {
     public TeleOpAction raiseToMid;
     public TeleOpAction raiseToLow;
     public TeleOpAction raiseToGround;
+    public TeleOpAction retractOdom;
+    public TeleOpAction releaseOdom;
 
     Robot robot;
 
@@ -60,16 +64,16 @@ public class ConeManipulator implements Subsystem {
        raiseToMid = new TeleOpAction(robot);
        raiseToLow = new TeleOpAction(robot);
        raiseToGround = new TeleOpAction(robot);
+       retractOdom = new TeleOpAction(robot);
+       releaseOdom = new TeleOpAction(robot);
     }
 
     public enum V4BPreset {
-        IN_MOST(0.85, 0.04),
-        INNER_PRIME(0.75, 0.15),
-        Vertiacal(0.44, 0.45),
-        DROP_AUTO(0.35, 0.55),
-        DROP(0.4, 0.5),
-        STRIGHT_OUT(0.2, 0.33),
-        GROUND_LEVEL(0.05, 0.84);
+        VERTICAL(0.5, 0.5),
+        PRIME(0.9, 0.1),
+        DROP(0.4, 0.6),
+        CORRECT_RIGHT(0, 0),
+        CORRECT_LEFT(0, 0);
 
         double left, right;
 
@@ -107,8 +111,90 @@ public class ConeManipulator implements Subsystem {
         intake.setPosition(grabberOpen);
     }
 
+    public void middle() {
+        intake.setPosition(grabberTransfer);
+    }
+
     public void setPosition(V4BPreset positions) {
-        setServoPositions(positions.getServoPositions());
+        double[] position = new double[] {positions.left, positions.right};
+
+        if(robot.tempSideFlip.getAsBoolean()) {
+            if (robot.intake.direction == Intake.DIRECTION.back) {
+                switch (positions) {
+                    case VERTICAL:
+                        position = new double[] {0.53, 0.47};
+                        break;
+                    case PRIME:
+                        position = new double[] {0.95, 0.05};
+                        break;
+                    case DROP:
+                        position = new double[] {0.4, 0.6};
+                        break;
+                    case CORRECT_RIGHT:
+                        position = new double[] {0.35, 0.7};
+                        break;
+                    case CORRECT_LEFT:
+                        break;
+                }
+            }
+            else {
+                switch (positions) {
+                    case VERTICAL:
+                        position = new double[] {0.53, 0.47};
+                        break;
+                    case PRIME:
+                        position = new double[] {0.08, 0.92};
+                        break;
+                    case DROP:
+                        position = new double[] {0.68, 0.4};
+                        break;
+                    case CORRECT_RIGHT:
+                        position = new double[] {0.75, 0.35};
+                        break;
+                    case CORRECT_LEFT:
+                        break;
+                }
+            }
+        }
+        else {
+            if (robot.intake.direction == Intake.DIRECTION.front) {
+                switch (positions) {
+                    case VERTICAL:
+                        position = new double[] {0.53, 0.47};
+                        break;
+                    case PRIME:
+                        position = new double[] {0.95, 0.05};
+                        break;
+                    case DROP:
+                        position = new double[] {0.4, 0.6};
+                        break;
+                    case CORRECT_RIGHT:
+                        position = new double[] {0.35, 0.7};
+                        break;
+                    case CORRECT_LEFT:
+                        break;
+                }
+            }
+            else {
+                switch (positions) {
+                    case VERTICAL:
+                        position = new double[] {0.53, 0.47};
+                        break;
+                    case PRIME:
+                        position = new double[] {0.08, 0.92};
+                        break;
+                    case DROP:
+                        position = new double[] {0.68, 0.4};
+                        break;
+                    case CORRECT_RIGHT:
+                        position = new double[] {0.75, 0.35};
+                    case CORRECT_LEFT:
+                        break;
+                }
+            }
+        }
+        setServoPositions(position);
+
     }
 
     public void setServoPositions(double[] positions) {
@@ -117,47 +203,73 @@ public class ConeManipulator implements Subsystem {
     }
 
     private void grabConeInit() {
-        grabCone.addAction(new CustomAction(()-> {
-            setPosition(ConeManipulator.V4BPreset.INNER_PRIME);
-            open();
-        }));
-        grabCone.addWait(0.2);
-        grabCone.addAction(new CustomAction(()-> setPosition(ConeManipulator.V4BPreset.IN_MOST)));
-        grabCone.addWait(0.3);
-        grabCone.addAction(new CustomAction(this::close));
-        grabCone.addWait(0.2);
-        grabCone.addAction(new CustomAction(()-> setPosition(ConeManipulator.V4BPreset.Vertiacal)));
-        grabCone.addWait(0.3);
+        grabCone.addCustomAction(()-> close());
+        grabCone.addWait(0.28);
+        grabCone.addAction(new CustomAction(()-> setPosition(V4BPreset.VERTICAL)));
     }
 
     private void dropConeAndReturnInit() {
-        dropConeAndReturn.addAction(new CustomAction(()-> robot.coneManipulator.open()));
-        dropConeAndReturn.addWait(0.3);
-        dropConeAndReturn.addAction(new CustomAction(()-> setPosition(V4BPreset.INNER_PRIME)));
-        dropConeAndReturn.addAction(new LiftSetPosition(robot, Lift.lowResting));
+        dropConeAndReturn.addCustomAction(()-> setPosition(V4BPreset.CORRECT_RIGHT));
+        dropConeAndReturn.addWait(0.1);
+        dropConeAndReturn.addCustomAction(()-> open());
+        dropConeAndReturn.addWait(0.05);
+        dropConeAndReturn.addAction(new CustomAction(()-> setPosition(V4BPreset.PRIME)));
+        dropConeAndReturn.addCustomAction(()-> close());
+        dropConeAndReturn.addWait(0.4);
+        dropConeAndReturn.addAction(new CustomAction(()-> robot.lift.setPosition(0)));
+        dropConeAndReturn.addWait(0);
+        dropConeAndReturn.addAction(new CustomAction(()-> open()));
     }
 
     private void raiseToTopInit() {
-        raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
-        raiseToTop.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
-        raiseToTop.addAction(new LiftSetPosition(robot, Lift.highPole));
+        raiseToTop.addAction(new CustomAction(()-> close()));
+        raiseToTop.addAction(new CustomAction(()-> setPosition(V4BPreset.DROP)));
+        raiseToTop.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.highPole)));
     }
 
     private void raiseToMidInit() {
-        raiseToTop.addCustomAction(()-> robot.coneManipulator.close());
-        raiseToMid.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
-        raiseToMid.addAction(new LiftSetPosition(robot, Lift.middlePole));
+        raiseToMid.addAction(new CustomAction(()-> close()));
+        raiseToMid.addAction(new CustomAction(()-> setPosition(V4BPreset.DROP)));
+        raiseToMid.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.middlePole)));
     }
 
     private void raiseToLowInit() {
-        raiseToLow.addCustomAction(()-> robot.coneManipulator.close());
-        raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
-        //raiseToLow.addCustomAction(()->robot.coneManipulator.setPosition(V4BPreset.DROP_AUTO));
-        raiseToLow.addAction(new LiftSetPosition(robot, Lift.smallPole));
+        raiseToLow.addAction(new CustomAction(()-> close()));
+        raiseToLow.addAction(new CustomAction(()-> setPosition(V4BPreset.DROP)));
+        raiseToLow.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.smallPole)));
     }
 
     private void raiseToGround() {
-        raiseToGround.addCustomAction(()-> robot.coneManipulator.setPosition(V4BPreset.GROUND_LEVEL));
+        raiseToGround.addCustomAction(()-> setPosition(V4BPreset.PRIME));
+        raiseToGround.addCustomAction(()-> open());
+    }
+
+    private void retractOdomInit() {
+        retractOdom.addAction(new CustomAction(() -> {
+            robot.localizer.leftRetract.setPower(-0.5);
+            robot.localizer.rightRetract.setPower(-0.5);
+            robot.localizer.latteralRetract.setPower(-0.5);
+        }));
+        retractOdom.addWait(0.7);
+        retractOdom.addAction(new CustomAction(() -> {
+            robot.localizer.leftRetract.setPower(0.0);
+            robot.localizer.rightRetract.setPower(0.0);
+            robot.localizer.latteralRetract.setPower(0.0);
+        }));
+    }
+
+    private void releaseOdomInit() {
+        releaseOdom.addAction(new CustomAction(() -> {
+            robot.localizer.leftRetract.setPower(0.5);
+            robot.localizer.rightRetract.setPower(0.5);
+            robot.localizer.latteralRetract.setPower(0.5);
+        }));
+        releaseOdom.addWait(0.7);
+        releaseOdom.addAction(new CustomAction(() -> {
+            robot.localizer.leftRetract.setPower(0.0);
+            robot.localizer.rightRetract.setPower(0.0);
+            robot.localizer.latteralRetract.setPower(0.0);
+        }));
     }
 
     private void initActions() {
@@ -167,13 +279,15 @@ public class ConeManipulator implements Subsystem {
         raiseToMidInit();
         raiseToTopInit();
         raiseToGround();
+        retractOdomInit();
+        releaseOdomInit();
     }
 
     @Override
     public void init() throws InterruptedException {
         initActions();
 
-        actions = new TeleOpAction[] {grabCone, dropConeAndReturn, raiseToTop, raiseToMid, raiseToLow, raiseToGround};
+        actions = new TeleOpAction[] {grabCone, dropConeAndReturn, raiseToTop, raiseToMid, raiseToLow, raiseToGround, retractOdom, releaseOdom};
     }
 
     @Override
