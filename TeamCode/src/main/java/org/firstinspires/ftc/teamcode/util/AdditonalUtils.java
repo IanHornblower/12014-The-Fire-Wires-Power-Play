@@ -4,8 +4,6 @@ import com.ThermalEquilibrium.homeostasis.Utils.Vector;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 
-import org.firstinspires.ftc.teamcode.math.Pose2D;
-
 public class AdditonalUtils {
 
 	/**
@@ -34,14 +32,6 @@ public class AdditonalUtils {
 	
 	public static double atan2(Vector v) {
 		return Math.atan2(v.get(1), v.get(0));
-	}
-
-	public static Pose2d ConvertPose2DtoPose2d(Pose2D pose) {
-		return new Pose2d(pose.x, pose.y, new Rotation2d(pose.heading));
-	}
-
-	public static Pose2D ConvertPose2dtoPose2D(Pose2d pose) {
-		return new Pose2D(pose.getX(), pose.getY(), pose.getHeading());
 	}
 
 }

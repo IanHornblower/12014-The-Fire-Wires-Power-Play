@@ -122,7 +122,7 @@ public class NewTeleOp extends LinearOpMode {
 
             rob.lift.setManuealPower(liftPower);
 
-            rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x * speed, -gamepad1.left_stick_y * speed, gamepad1.right_stick_x*0.65);
+            //rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x * speed, -gamepad1.left_stick_y * speed, gamepad1.right_stick_x*0.65);
 
 
             if(rob.lift.manueal) {

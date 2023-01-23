@@ -36,13 +36,13 @@ public class LocalizationTesting extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()) {
 
-            rob.driveTrain.driveFieldCentric(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x*0.8, 0);
+            //rob.driveTrain.driveFieldCentric(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x*0.8, 0);
 
 
             telemetry.addData("left", rob.localizer.getWheelPositions().get(0));
             telemetry.addData("right", rob.localizer.getWheelPositions().get(1));
             telemetry.addData("front", rob.localizer.getWheelPositions().get(2));
-            telemetry.addData("pose", rob.localizer.getPose().toString());
+           // telemetry.addData("pose", rob.localizer.getPose().toString());
             telemetry.update();
 
             try {

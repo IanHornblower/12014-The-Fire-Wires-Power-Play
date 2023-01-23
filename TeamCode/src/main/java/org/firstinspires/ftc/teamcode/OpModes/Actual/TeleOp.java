@@ -218,7 +218,7 @@ public class TeleOp extends LinearOpMode {
              *      - When not pressed - Do not move
              */
 
-            rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x*speed, -gamepad1.left_stick_y*speed, gamepad1.right_stick_x*0.8);
+           // rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x*speed, -gamepad1.left_stick_y*speed, gamepad1.right_stick_x*0.8);
             //rob.driveTrain.driveFieldCentric(gamepad1.left_stick_x*speed, -gamepad1.left_stick_y*speed, gamepad1.right_stick_x*speed);
 
             telemetry.addLine(Color.WHITE.format("---------------MATCH DATA----------------"));
@@ -237,7 +237,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Lift Power", rob.lift.lower.getPower());
             telemetry.addData("Limit Switch", rob.lift.isLiftDown());
             telemetry.addData("Lift Encoder", rob.lift.getEncoderPosition());
-            telemetry.addData("Front Left Value", rob.driveTrain.motors[0].getCurrentPosition());
+         //   telemetry.addData("Front Left Value", rob.driveTrain.motors[0].getCurrentPosition());
             telemetry.addData("imu velo", Math.toDegrees(rob.imu.getExternalHeadingVelocity()));
 
            // telemetry.addData("Distacne", rob.lineAlignment.getDistance());

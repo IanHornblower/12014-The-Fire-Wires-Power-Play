@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Actual;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 
 @Disabled
 @Autonomous
-public class AutoTemplate extends LinearOpMode {
+public class RightSideAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Setup Robot Hardware & Define OpMode Type
@@ -21,10 +21,6 @@ public class AutoTemplate extends LinearOpMode {
 
         // Fancify Telemetry
         telemetry = rob.getTelemetry();
-
-        // Start Pose
-        Pose2d start = new Pose2d(0, 0,0);
-        rob.driveTrain.setPoseEstimate(start);
 
         // Init Robot
         rob.init();
@@ -34,7 +30,7 @@ public class AutoTemplate extends LinearOpMode {
         timer.start();
 
         ActionSequence lift = new ActionSequence();
-        ActionSequence driveTrain = new ActionSequence();
+        ActionSequence driveTrain = new ActionSequence(rob);
 
         ActionSequenceRunner driveTrainRunner = new ActionSequenceRunner(rob);
         driveTrainRunner.setActionSequence(driveTrain);
@@ -43,6 +39,11 @@ public class AutoTemplate extends LinearOpMode {
         liftRunner.setActionSequence(lift);
 
         if(isStopRequested()) return;
+
+        driveTrain.FollowTrajectory(rob.driveTrain.trajectoryBuilder(rob.driveTrain.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(0, 0, 0))
+                .build()
+        );
 
         while(opModeInInit() && !isStopRequested()) {
             telemetry.addLine(Color.WHITE.format("INIT FINISHED")); // Do this later | fancy title

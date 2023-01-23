@@ -3,17 +3,17 @@ package org.firstinspires.ftc.teamcode.ActionSystem.actions;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.AngleController;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.BasicPID;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.ActionSystem.Action;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.DriveConstraints;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain;
 
 public class EncoderDrive extends Action {
 
     Robot robot;
-    DriveTrain dt;
+    SampleMecanumDrive dt;
     double x, y, heading;
     int ticks;
 
@@ -57,7 +57,8 @@ public class EncoderDrive extends Action {
 
     @Override
     public void startAction() {
-        robot.driveTrain.resetEncoders();
+        robot.driveTrain.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.driveTrain.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     @Override
@@ -65,19 +66,19 @@ public class EncoderDrive extends Action {
         double heading_error = headingController.calculate(heading, robot.imu.getHeadingInRadians());
 
         if(fieldCentric) {
-            dt.driveFieldCentric(x, y, heading_error);
+          //  dt.dr(x, y, heading_error);
         }
         else {
-            dt.setMotorPowers(x, y, heading_error);
+          //  dt.setMotorPowers(x, y, heading_error);
         }
 
-        for(DcMotorEx motor : dt.motors) {
-            isComplete = Math.abs(motor.getCurrentPosition()) > ticks;
+        for(double d : dt.getWheelPositions()) {
+            isComplete = Math.abs(d) > ticks;
         }
     }
 
     @Override
     public void stopAction() {
-        dt.stopDriveTrain();
+        dt.setMotorPowers(0, 0, 0,0);
     }
 }

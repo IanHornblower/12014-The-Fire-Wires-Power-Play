@@ -15,8 +15,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.math.Point;
-import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.firstinspires.ftc.teamcode.util.Timer;
 
@@ -37,7 +35,7 @@ import java.util.List;
  *
  */
 @Config
-public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer implements Subsystem {
+public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
     public static double WHEEL_RADIUS = 0.688975; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
@@ -47,10 +45,6 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     public static double X_MULTIPLIER = 1.025641025641026;
     public static double Y_MULTIPLIER = 1.076233183856502;
-
-    double accumulatedDistance = 0;
-
-    Point previousPoint;
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
@@ -82,6 +76,30 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         latteralRetract.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
+        super(Arrays.asList(
+                new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
+                new Pose2d(0, -LATERAL_DISTANCE / 2, 0), // right
+                new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
+        ));
+
+        this.robot = robot;
+
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fr"));  // 0
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bl")); // 3
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fl")); // 1
+
+        //leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        //rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
+        // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+
+        leftRetract = hardwareMap.get(CRServo.class, "leftRe");
+        rightRetract = hardwareMap.get(CRServo.class, "rightRe");
+        latteralRetract = hardwareMap.get(CRServo.class, "latRe");
+        latteralRetract.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
     }
@@ -110,59 +128,4 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         );
     }
 
-    public Pose2D getPose() {
-        Pose2d pose = getPoseEstimate();
-
-        return new Pose2D(-pose.getY(), pose.getX(), pose.getHeading());
-    }
-
-    public Pose2D getRawVelocityPos() {
-        Pose2d pose = getPoseVelocity();
-
-        if(pose != null) {
-            return new Pose2D(-pose.getY(), pose.getX(), pose.getHeading());
-        }
-        return new Pose2D(0, 0, 0);
-    }
-
-    public Pose2D getRotatedVelocityPos() {
-        return getRawVelocityPos().rotate(-getPose().heading);
-    }
-
-    @Override
-    public void update() {
-        super.update();
-
-        accumulatedDistance += getPose()
-                .toPoint()
-                .subtract(previousPoint)
-                .hypot();
-
-        previousPoint = getPose().toPoint();
-
-        TelemetryPacket robotPosition = new TelemetryPacket();
-
-        Point point = new Point(getPoseEstimate().getX() + 9, getPoseEstimate().getY()).rotate(getPoseEstimate().getHeading());
-        robotPosition.fieldOverlay().strokeCircle(getPoseEstimate().getX(), getPoseEstimate().getY(), 9);
-        robotPosition.fieldOverlay().strokeLine(getPoseEstimate().getX(), getPoseEstimate().getY(), point.x, point.y);
-
-        FtcDashboard.getInstance().sendTelemetryPacket(robotPosition);
-    }
-
-    public double getAccumulatedDistance() {
-        return accumulatedDistance;
-    }
-
-    public void resetAccumulatedDistance() {
-         accumulatedDistance = 0;
-    }
-
-    public void setStartPosition(Pose2D pose) {
-        setPoseEstimate(new Pose2d(pose.y, pose.x, pose.heading));
-    }
-
-    @Override
-    public void init() throws InterruptedException {
-        previousPoint = getPose().toPoint();
-    }
 }

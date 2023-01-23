@@ -66,7 +66,7 @@ public class NewRobotTestingOpMode extends LinearOpMode {
 
             double liftPower = (liftSpeed * gamepad1.right_trigger) + (-liftSpeed * gamepad1.left_trigger);
 
-            rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x*0.8);
+            //rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x*0.8);
 
 
             //rob.localizer.leftRetract.setPower(intakeSpeed);
