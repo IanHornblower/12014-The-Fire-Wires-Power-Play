@@ -1,25 +1,21 @@
 package org.firstinspires.ftc.teamcode.ActionSystem.actions.roadrunnerActions;
 
-import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.AngleController;
-import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.BasicPID;
-import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
-import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.ActionSystem.Action;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.hardware.DriveConstraints;
+import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.util.Timer;
 
-public class FollowTrajectory extends Action {
+public class FollowTrajectorySequence extends Action {
 
     Robot robot;
     SampleMecanumDrive dt;
 
-    Trajectory trajectory;
-    public FollowTrajectory(Robot robot, Trajectory trajectory) {
+
+    TrajectorySequence trajectory;
+    public FollowTrajectorySequence(Robot robot, TrajectorySequence trajectory) {
         this.robot = robot;
         this.dt = robot.driveTrain;
         this.trajectory = trajectory;
@@ -27,7 +23,7 @@ public class FollowTrajectory extends Action {
 
     @Override
     public void startAction() {
-        dt.followTrajectoryAsync(trajectory);
+        dt.followTrajectorySequenceAsync(trajectory);
     }
 
     @Override

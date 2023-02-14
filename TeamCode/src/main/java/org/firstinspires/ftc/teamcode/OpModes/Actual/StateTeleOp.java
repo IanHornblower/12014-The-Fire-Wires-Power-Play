@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes.Actual;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,8 +17,8 @@ import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Timer;
 
 @Config
-@TeleOp(name = "TeleOp")
-public class NewTeleOp extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp")
+public class StateTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,9 +34,39 @@ public class NewTeleOp extends LinearOpMode {
         Timer timer = new Timer();
         timer.reset();
 
-        rob.tempSideFlip = ()-> gamepad2.left_trigger > 0.1;
+        rob.coneManipulator.definePower(()-> gamepad2.right_stick_y);
+
+        rob.coneManipulator.auto = false;
 
         waitForStart();
+
+        // My Gamepad Map
+        /*
+        Left Trigger -- Simple Drop
+        Right Trigger -- AUTO Grab
+
+        Left Bumper  - Drop Release
+        Right Bumber - Grab
+
+        Cross
+        Triangle -- nun
+        Square -- Switch To Manual Lift
+        Circle -- Switch To Auto Lift
+        Cross -- Reset Lift Enc
+
+
+        DPAD
+            - Left -- Low
+            - Right -- High
+            - Up -- Mid
+            - Down --
+
+        Joystick Left
+        Joystick Right
+        Joystick Left Btn
+        Joystick Right Btn
+
+         */
 
         rob.coneManipulator.raiseToTop.start(()-> gamepad2.dpad_right); // GROUND
         rob.coneManipulator.raiseToMid.start(()-> gamepad2.dpad_up); // GROUND
@@ -43,8 +74,11 @@ public class NewTeleOp extends LinearOpMode {
         rob.coneManipulator.dropConeAndReturn.start(()-> gamepad2.left_bumper); // GROUND
         rob.coneManipulator.grabCone.start(()-> gamepad2.right_bumper);
         rob.coneManipulator.raiseToGround.start(()-> gamepad2.dpad_down);
-        rob.coneManipulator.retractOdom.start(()-> gamepad2.left_stick_button);
-        rob.coneManipulator.releaseOdom.start(()-> gamepad2.right_stick_button);
+        //rob.coneManipulator.retractOdom.start(()-> gamepad1.right_stick_button);
+        rob.coneManipulator.correctCone.start(()-> gamepad1.circle);
+        rob.coneManipulator.raiseLift.start(()-> gamepad1.triangle);
+        rob.coneManipulator.releaseOdom.start(()-> gamepad1.left_stick_button);
+        rob.coneManipulator.dropConeAndReturnFar.start(()-> gamepad2.left_trigger > 0.1);
 
         rob.intake.setDirection(Intake.DIRECTION.front);
 
@@ -56,23 +90,57 @@ public class NewTeleOp extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()) {
 
-            if(gamepad2.touchpad && timer.currentSeconds() > 0.3) {
+            if(gamepad1.touchpad && timer.currentSeconds() > 0.3) {
                 timer.reset();
-                gamepad2.rumble(300);
+                gamepad1.rumble(300);
                 front = !front;
             }
 
-            if(gamepad1.triangle) {
+            if(gamepad2.touchpad && timer.currentSeconds() > 0.3) {
+                timer.reset();
+                gamepad2.rumble(300);
+                rob.coneManipulator.auto = !rob.coneManipulator.auto;
+            }
+
+            if(gamepad1.right_bumper) {
                 speed = 1;
             }
             if(gamepad1.circle) {
-                speed = 0.8;
+              //  speed = 0.8;
             }
-            if(gamepad1.cross) {
+            if(gamepad1.left_bumper) {
                 speed = 0.6;
             }
             if(gamepad1.square) {
-                speed = 0.4;
+              //  speed = 0.4;
+            }
+
+            if(gamepad1.left_stick_button) {
+                rob.release();
+            }
+            if(gamepad1.right_stick_button) {
+                rob.retract();
+            }
+
+            if(gamepad1.dpad_down) {
+                rob.coneStack = 2;
+                rob.coneManipulator.grabConeFromStack.start();
+            }
+            if(gamepad1.dpad_up) {
+                rob.coneStack = 4;
+                rob.coneManipulator.grabConeFromStack.start();
+            }
+            if(gamepad1.dpad_right) {
+                rob.coneStack = 5;
+                rob.coneManipulator.grabConeFromStack.start();
+            }
+            if(gamepad1.dpad_left) {
+                rob.coneStack = 3;
+                rob.coneManipulator.grabConeFromStack.start();
+            }
+
+            if(gamepad2.right_stick_button) {
+                rob.coneManipulator.resetEnc();
             }
 
             telemetry.addLine(Color.WHITE.format("---------------MATCH DATA----------------"));
@@ -80,13 +148,20 @@ public class NewTeleOp extends LinearOpMode {
 
             if(front) {
                 rob.intake.setDirection(Intake.DIRECTION.back);
-                gamepad2.setLedColor(0, 255, 255, 300);
-                telemetry.addData("Intake SIDE", Color.CYAN.format("BACK"));
+                gamepad1.setLedColor(0, 255, 255, 300);
+                telemetry.addData("Intake SIDE", Color.CYAN.format("FRONT"));
             }
             else {
                 rob.intake.setDirection(Intake.DIRECTION.front);
-                gamepad2.setLedColor(255, 255, 0, 300);
-                telemetry.addData("Intake SIDE", Color.YELLOW.format("FRONT"));
+                gamepad1.setLedColor(255, 255, 0, 300);
+                telemetry.addData("Intake SIDE", Color.YELLOW.format("BACK"));
+            }
+
+            if(rob.coneManipulator.auto) {
+                gamepad2.setLedColor(0, 255, 0, 300);
+            }
+            else {
+                gamepad1.setLedColor(255, 0, 0, 300);
             }
 
             if(gamepad1.left_trigger > 0.1) {
@@ -99,7 +174,8 @@ public class NewTeleOp extends LinearOpMode {
                 rob.intake.setPower(0);
             }
 
-            if(rob.intake.hasCone() && rob.lift.isLiftDown() && !rob.coneManipulator.grabCone.isActionRunning() && !gamepad2.right_bumper) {
+            // Auto intake
+            if(rob.intake.hasCone() && rob.lift.isLiftDown() && !rob.coneManipulator.grabCone.isActionRunning() && !gamepad2.right_bumper && gamepad2.right_trigger > 0.1) {
                 rob.coneManipulator.grabCone.start();
             }
 
@@ -122,19 +198,29 @@ public class NewTeleOp extends LinearOpMode {
 
             rob.lift.setManuealPower(liftPower);
 
-            //rob.driveTrain.setWeightedDrivePower(gamepad1.left_stick_x * speed, -gamepad1.left_stick_y * speed, gamepad1.right_stick_x*0.65);
+            if(rob.intake.direction == Intake.DIRECTION.front) {
+                rob.driveTrain.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y * speed, -gamepad1.left_stick_x * speed, -gamepad1.right_stick_x*0.65));
+            }
+            else {
+                rob.driveTrain.setWeightedDrivePower(new Pose2d(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, -gamepad1.right_stick_x*0.65));
 
+            }
 
             if(rob.lift.manueal) {
-                telemetry.addData("Lift Mode", Color.RED.format("Manuel"));
+                telemetry.addData("Lift Mode", Color.RED.format("Manual"));
             }
             else {
                 telemetry.addData("Lift Mode", Color.GREEN.format("Automatic"));
             }
 
+            if(rob.coneManipulator.auto) {
+                telemetry.addData("V4B Mode", Color.GREEN.format("Automatic"));
+            }
+            else {
+                telemetry.addData("V4B Mode", Color.RED.format("Manual"));
 
-            //telemetry.addData("Amps",rob.lift.lower.getCurrent(CurrentUnit.MILLIAMPS));
-            //telemetry.addData("lift enc", rob.lift.getEncoderPosition());
+            }
+
             if(rob.intake.hasCone()) {
                 telemetry.addLine(Color.GREEN.format("HAS CONE"));
                 //telemetry.addData("Detector Distance", Color.GREEN.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
@@ -144,6 +230,8 @@ public class NewTeleOp extends LinearOpMode {
                 //telemetry.addData("Detector Distance", Color.RED.format(rob.intake.detector.getDistance(DistanceUnit.MM)));
             }
             telemetry.addData("lift pos", rob.lift.getEncoderPosition());
+            telemetry.addData("fourbar pos", rob.coneManipulator.fourbar.getCurrentPosition());
+            telemetry.addData("fourbar angle", Math.toDegrees(rob.coneManipulator.getAngle()));
             telemetry.update();
 
             try {
@@ -151,6 +239,7 @@ public class NewTeleOp extends LinearOpMode {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
     }
 }

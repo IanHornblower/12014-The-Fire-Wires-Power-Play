@@ -11,8 +11,8 @@ public class LiftSetPosition extends Action {
     Robot robot;
     double position;
 
-    public double tolerance = 100;
-    double error = 1e+9;
+    public double tolerance = 30;
+    boolean instant = false;
 
     public LiftSetPosition(Robot robot, double position) {
         this.robot = robot;
@@ -25,6 +25,19 @@ public class LiftSetPosition extends Action {
         this.tolerance = tolerance;
     }
 
+    public LiftSetPosition(Robot robot, double position, boolean instant) {
+        this.robot = robot;
+        this.position = position;
+        this.instant = instant;
+    }
+
+    public LiftSetPosition(Robot robot, double position, double tolerance, boolean instant) {
+        this.robot = robot;
+        this.position = position;
+        this.tolerance = tolerance;
+        this.instant = instant;
+    }
+
     @Override
     public void startAction() {
         robot.lift.setPosition(position);
@@ -33,8 +46,7 @@ public class LiftSetPosition extends Action {
     @Override
     public void runAction() throws InterruptedException {
         error = position - robot.lift.getEncoderPosition();
-
-        isComplete = error < tolerance;
+        isComplete = Math.abs(error) < tolerance || instant;
     }
 
     @Override

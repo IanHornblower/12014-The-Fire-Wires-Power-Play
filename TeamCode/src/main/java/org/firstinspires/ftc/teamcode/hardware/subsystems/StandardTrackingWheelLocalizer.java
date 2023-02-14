@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
@@ -40,15 +41,13 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 0.688975; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 13.1; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET =  4.4375; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 13.8; //13.5 // in; distance between the left and right wheels
+    public static double FORWARD_OFFSET =  4.4375;  // in; offset of the lateral wheel
 
     public static double X_MULTIPLIER = 1.025641025641026;
     public static double Y_MULTIPLIER = 1.076233183856502;
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
-
-    public CRServo leftRetract, rightRetract, latteralRetract;
 
     Robot robot;
 
@@ -69,11 +68,6 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         //rightEncoder.setDirection(Encoder.Direction.REVERSE);
         frontEncoder.setDirection(Encoder.Direction.REVERSE);
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-
-        leftRetract = robot.hwMap.get(CRServo.class, "leftRe");
-        rightRetract = robot.hwMap.get(CRServo.class, "rightRe");
-        latteralRetract = robot.hwMap.get(CRServo.class, "latRe");
-        latteralRetract.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
@@ -83,8 +77,6 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        this.robot = robot;
-
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fr"));  // 0
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bl")); // 3
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fl")); // 1
@@ -93,11 +85,6 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         //rightEncoder.setDirection(Encoder.Direction.REVERSE);
         frontEncoder.setDirection(Encoder.Direction.REVERSE);
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-
-        leftRetract = hardwareMap.get(CRServo.class, "leftRe");
-        rightRetract = hardwareMap.get(CRServo.class, "rightRe");
-        latteralRetract = hardwareMap.get(CRServo.class, "latRe");
-        latteralRetract.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {

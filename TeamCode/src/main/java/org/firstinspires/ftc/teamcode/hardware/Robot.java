@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import android.graphics.Color;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
@@ -53,6 +57,9 @@ public class Robot {
         }
     }
 
+    public Servo leftRetract, rightRetract, latteralRetract;
+    public int coneStack = 5;
+
     public Robot (HardwareMap hwMap, Telemetry telemetry, OPMODE_TYPE type) {
         this.hwMap = hwMap;
 
@@ -60,13 +67,12 @@ public class Robot {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboardInstance.getTelemetry());
 
         switch (type.getValue()) {
+
             case 0: // Auto
                 driveTrain = new SampleMecanumDrive(this);
                 intake = new Intake(this);
                 lift = new Lift(this);
                 coneManipulator = new ConeManipulator(this);
-                //imu = new IMU(this);
-                //localizer = new StandardTrackingWheelLocalizer(this);
                 rearCamera = new RearCamera(this, hwMap);
 
                 subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, rearCamera};
@@ -76,7 +82,6 @@ public class Robot {
                 intake = new Intake(this);
                 lift = new Lift(this);
                 coneManipulator = new ConeManipulator(this);
-                //localizer = new StandardTrackingWheelLocalizer(this);
 
                 subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
                 break;
@@ -96,15 +101,29 @@ public class Robot {
             subsystem.init();
         }
 
-       // PhotonCore.enable();
+        leftRetract = hwMap.get(Servo.class, "leftRe");
+        rightRetract = hwMap.get(Servo.class, "rightRe");
+        latteralRetract = hwMap.get(Servo.class, "latRe");
+
+        //PhotonCore.enable();
+    }
+
+    public void retract() {
+        leftRetract.setPosition(0);//
+        rightRetract.setPosition(0);
+        latteralRetract.setPosition(1);
+    }
+
+    public void release() {
+        leftRetract.setPosition(1);//
+        rightRetract.setPosition(1);
+        latteralRetract.setPosition(0);
     }
 
     public void update() throws InterruptedException {
         for (Subsystem subsystem : subsystems){
             subsystem.update();
         }
-
-        //FtcDashboard.getInstance().sendTelemetryPacket(DashboardDrawUtil.drawRobot(t265.getPose(), new TelemetryPacket()));
     }
 
 

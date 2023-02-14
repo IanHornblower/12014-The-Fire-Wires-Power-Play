@@ -48,6 +48,10 @@ public class RearCamera implements Subsystem {
         camera.stopStreaming();
     }
 
+    public void reInit() {
+        combinedTracker.reInitSleevePoints();
+    }
+
     public void setCameraRotation(OpenCvCameraRotation rotation) {
         cameraRotation = rotation;
     }

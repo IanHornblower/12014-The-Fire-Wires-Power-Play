@@ -83,8 +83,8 @@ public class CombinedTracker extends OpenCvPipeline {
     public static int REGION_HEIGHT = 35;
 
     // Anchor Point
-    public static int anchorPointX = 182;
-    public static int anchorPointY = 90;
+    public static int anchorPointX = 187;
+    public static int anchorPointY = 95;
 
     // TOPLEFT anchor point for the bounding box
     private static final Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(anchorPointX, anchorPointY);
@@ -96,6 +96,15 @@ public class CombinedTracker extends OpenCvPipeline {
     Point sleeve_pointB = new Point(
             SLEEVE_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
             SLEEVE_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+
+    public void reInitSleevePoints() {
+        sleeve_pointA = new Point(
+                SLEEVE_TOPLEFT_ANCHOR_POINT.x,
+                SLEEVE_TOPLEFT_ANCHOR_POINT.y);
+        sleeve_pointB = new Point(
+                SLEEVE_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
+                SLEEVE_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+    }
 
     // Mat objects
     private final Mat maskRed = new Mat();

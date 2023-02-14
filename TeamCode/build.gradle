@@ -14,6 +14,8 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
@@ -24,9 +26,14 @@ repositories {
     maven { url = "https://maven.0x778.tk" }
 }
 
+
+
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+    //noinspection GradleDependency
+    //implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+
 
 
     implementation 'com.github.Eeshwar-Krishnan:PhotonFTC:v2.0.1'
