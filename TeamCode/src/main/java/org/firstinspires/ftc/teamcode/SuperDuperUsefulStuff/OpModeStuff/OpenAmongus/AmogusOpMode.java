@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff.OpenAmongus;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@Disabled
 // Remember to change font size to small on the driver station!
 @TeleOp(name =
     "🟦🟦🟦🟦🟦🟦🟦🟦🟦⬛⬛⬛⬛⬛🟦🟦🟦🟦🟦🟦🟦\n" +

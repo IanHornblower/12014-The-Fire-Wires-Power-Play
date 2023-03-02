@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff.OpModeInformations;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
@@ -38,7 +39,14 @@ public class StateTeleOp extends LinearOpMode {
 
         rob.coneManipulator.auto = false;
 
+        rob.retract();
+
         waitForStart();
+
+        rob.retract();
+
+        ConeManipulator.speedFast = 1;
+        ConeManipulator.speedSlow = 0.6;
 
         // My Gamepad Map
         /*
@@ -82,6 +90,9 @@ public class StateTeleOp extends LinearOpMode {
 
         rob.intake.setDirection(Intake.DIRECTION.front);
 
+        Timer bump = new Timer();
+        bump.start();
+
         double speed = 0.6;
 
        // rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.PRIME);
@@ -122,21 +133,40 @@ public class StateTeleOp extends LinearOpMode {
                 rob.retract();
             }
 
-            if(gamepad1.dpad_down) {
-                rob.coneStack = 2;
-                rob.coneManipulator.grabConeFromStack.start();
+            if(gamepad2.left_trigger > 0.1 && bump.currentSeconds() > 0.15) {
+                rob.coneManipulator.open();
+                rob.coneManipulator.intake.setPosition(1);
+                bump.reset();
             }
-            if(gamepad1.dpad_up) {
-                rob.coneStack = 4;
-                rob.coneManipulator.grabConeFromStack.start();
+
+            if(gamepad2.left_bumper && bump.currentSeconds() > 0.15) {
+                rob.coneManipulator.open();
+                bump.reset();
+            }
+
+            if(gamepad2.triangle) {
+                rob.coneManipulator.open();
+            }
+
+            if(gamepad1.dpad_down && bump.currentSeconds() > 0.2) {
+                rob.coneManipulator.setPosition(rob.coneManipulator.fourbar.getCurrentPosition() + 50);
+                bump.reset();
+                //rob.coneStack = 2;
+                //rob.coneManipulator.grabConeFromStack.start();
+            }
+            if(gamepad1.dpad_up && bump.currentSeconds() > 0.2) {
+                rob.coneManipulator.setPosition(rob.coneManipulator.fourbar.getCurrentPosition() - 50);
+                bump.reset();
+                //rob.coneStack = 4;
+                //rob.coneManipulator.grabConeFromStack.start();
             }
             if(gamepad1.dpad_right) {
-                rob.coneStack = 5;
-                rob.coneManipulator.grabConeFromStack.start();
+                //rob.coneStack = 5;
+                //rob.coneManipulator.grabConeFromStack.start();
             }
             if(gamepad1.dpad_left) {
-                rob.coneStack = 3;
-                rob.coneManipulator.grabConeFromStack.start();
+                //rob.coneStack = 3;
+                //rob.coneManipulator.grabConeFromStack.start();
             }
 
             if(gamepad2.right_stick_button) {
@@ -232,6 +262,11 @@ public class StateTeleOp extends LinearOpMode {
             telemetry.addData("lift pos", rob.lift.getEncoderPosition());
             telemetry.addData("fourbar pos", rob.coneManipulator.fourbar.getCurrentPosition());
             telemetry.addData("fourbar angle", Math.toDegrees(rob.coneManipulator.getAngle()));
+
+            telemetry.addLine(Color.WHITE.format("AMOGUS BELOW") + Color.RED.format(" BEWARE"));
+            telemetry.addLine();
+            telemetry.addLine();
+            telemetry.addLine(OpModeInformations.amogus);
             telemetry.update();
 
             try {

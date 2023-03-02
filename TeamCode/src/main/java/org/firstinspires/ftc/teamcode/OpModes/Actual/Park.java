@@ -1,24 +1,23 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OpModes.Actual;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequence;
-import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequenceRunner;
+import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff.OpModeInformations;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.RearCamera;
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 
-@Disabled
-@Autonomous
-public class AutoTemplate extends LinearOpMode {
+@Autonomous(name="Just Park", group = "AUTO")
+public class Park extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Setup Robot Hardware & Define OpMode Type
@@ -28,8 +27,11 @@ public class AutoTemplate extends LinearOpMode {
         telemetry = rob.getTelemetry();
 
         // Start Pose
-        Pose2d start = new Pose2d(0, 0,0);
+        Pose2d start = new Pose2d(-39, -62, Math.toRadians(-90));
         rob.driveTrain.setPoseEstimate(start);
+
+        // Reset 4bar enc
+        rob.coneManipulator.resetEnc();
 
         // Init Robot
         rob.init();
@@ -38,29 +40,37 @@ public class AutoTemplate extends LinearOpMode {
         Timer timer = new Timer();
         timer.start();
 
-        ActionSequence lift = new ActionSequence();
-        ActionSequence driveTrain = new ActionSequence();
-
-        ActionSequenceRunner driveTrainRunner = new ActionSequenceRunner(rob);
-        driveTrainRunner.setActionSequence(driveTrain);
-
-        ActionSequenceRunner liftRunner = new ActionSequenceRunner(rob);
-        liftRunner.setActionSequence(lift);
-
         if(isStopRequested()) return;
 
-        rob.release();
-        rob.intake.setDirection(Intake.DIRECTION.back);
-        rob.coneManipulator.close();
-        sleep(500);
-        rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
+        TrajectorySequence left = rob.driveTrain.trajectorySequenceBuilder(start)
+                .strafeTo(new Vector2d(-60, -58))
+                .setReversed(true)
+                .splineTo(new Vector2d(-60, -17), Math.toRadians(90))
+                .build();
 
-//        CombinedTracker.ParkingPosition location = CombinedTracker.ParkingPosition.CENTER;
+        TrajectorySequence middle = rob.driveTrain.trajectorySequenceBuilder(start)
+                .setReversed(true)
+                .splineTo(new Vector2d(-36, -38), Math.toRadians(90))
+                .splineTo(new Vector2d(-36, -20), Math.toRadians(90))
+                .build();
+
+        TrajectorySequence right = rob.driveTrain.trajectorySequenceBuilder(start)
+                .strafeTo(new Vector2d(-6, -58))
+                .setReversed(true)
+                .splineTo(new Vector2d(-6, -20), Math.toRadians(90))
+                .build();
+
+        rob.release();
+
+        //CombinedTracker.ParkingPosition location = CombinedTracker.ParkingPosition.CENTER;
 
         RearCamera.State location = RearCamera.State.NONE;
 
+
         while(opModeInInit() && !isStopRequested()) {
             telemetry.addLine(Color.WHITE.format("INIT FINISHED")); // Do this later | fancy title
+            telemetry.addLine(rob.rearCamera.getTelemetry());
+            telemetry.addData("pos", rob.rearCamera.getSleeveLocation().toString());
             telemetry.addData("Time Since Init", Color.LIME.format(timer.currentSeconds()));
             telemetry.update();
 
@@ -75,16 +85,15 @@ public class AutoTemplate extends LinearOpMode {
 
         switch (location) {
             case LEFT:
-
+                rob.driveTrain.followTrajectorySequenceAsync(left);
                 break;
             case MIDDLE:
-
+                rob.driveTrain.followTrajectorySequenceAsync(middle);
                 break;
             case RIGHT:
-
+                rob.driveTrain.followTrajectorySequenceAsync(right);
                 break;
         }
-
 
         waitForStart();
 
@@ -92,29 +101,15 @@ public class AutoTemplate extends LinearOpMode {
         rob.rearCamera.camera.closeCameraDevice();
 
         while(opModeIsActive() && !isStopRequested()) {
-            if(!driveTrainRunner.isComplete()) {
-                try {
-                    driveTrainRunner.update();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if(!liftRunner.isComplete()) {
-                try {
-                    liftRunner.update();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            rob.driveTrain.update();
+            rob.update();
 
 
-            if(driveTrainRunner.isComplete() && liftRunner.isComplete()) {
+            if(!rob.driveTrain.isBusy()) {
                 rob.driveTrain.setMotorPowers(0, 0,0, 0);
-                rob.retract();
-                stop();
+                //stop();
             }
-            
+
             telemetry.addLine(Color.WHITE.format("---------------AUTO DATA----------------"));
             telemetry.addData("Time Elapsed in Auto", Color.LIME.format(MathUtil.roundPlaces(timer.currentSeconds(), 2)));
             telemetry.addLine();
@@ -126,9 +121,11 @@ public class AutoTemplate extends LinearOpMode {
             telemetry.addData("Fourbar Encoder Target", rob.coneManipulator.position);
             telemetry.addData("Fourbar Encoder State", rob.coneManipulator.fourbar.getCurrentPosition());
             telemetry.addData("Fourbar Angle State", Math.toDegrees(rob.coneManipulator.getAngle()));
+
+            telemetry.addLine(Color.WHITE.format("AMOGUS BELOW") + Color.RED.format(" BEWARE"));
             telemetry.addLine();
-            telemetry.addData("Lift Step", liftRunner.getCurrentAction());
-            telemetry.addData("Drive Train Step", driveTrainRunner.getCurrentAction());
+            telemetry.addLine();
+            telemetry.addLine(OpModeInformations.getMongus(timer.currentSeconds()));
             telemetry.update();
         }
     }

@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff;
+package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic;
+
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import kotlin.Throws
-
+@Disabled
 @TeleOp(name="Celeste")
 class CelesteOpmode : LinearOpMode() {
     @Throws(InterruptedException::class)

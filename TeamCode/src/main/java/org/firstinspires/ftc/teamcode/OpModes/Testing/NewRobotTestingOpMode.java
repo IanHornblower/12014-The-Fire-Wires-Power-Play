@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.util.Timer;
 
+@Disabled
 @Config
 @TeleOp(name = "New Robot Testing")
 public class NewRobotTestingOpMode extends LinearOpMode {
@@ -95,8 +96,6 @@ public class NewRobotTestingOpMode extends LinearOpMode {
             }
 
              */
-
-            rob.lift.regeneratePID();
 
             rob.lift.setPosition(liftPos);
             rob.coneManipulator.setPosition(liftPos);

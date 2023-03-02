@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 
+@Disabled
 @Config
 @TeleOp
 public class CameraTuning extends LinearOpMode {
@@ -65,7 +66,7 @@ public class CameraTuning extends LinearOpMode {
 
             if(isStopRequested()) return;
 
-            rob.rearCamera.reInit();
+         //   rob.rearCamera.reInit();
 
             telemetry.addData("point x", CombinedTracker.anchorPointX);
             telemetry.addData("point y", CombinedTracker.anchorPointY);
@@ -77,7 +78,7 @@ public class CameraTuning extends LinearOpMode {
         while(opModeIsActive() && !isStopRequested()) {
 
 
-            telemetry.addData("Cone Error", rob.rearCamera.getObjectError());
+//            telemetry.addData("Cone Error", rob.rearCamera.getObjectError());
 
             try {
                 rob.update();

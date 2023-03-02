@@ -81,7 +81,7 @@ public class TeleOpAction {
             start = true;
             timer.reset();
         }
-        else if (bool != null && bool.getAsBoolean() && !isComplete && start && timer.currentSeconds() > 0.4) {
+        else if (bool != null && bool.getAsBoolean() && !isComplete && start && timer.currentSeconds() > 0.4 && false) { // Disable cancellation of action
             currentState = 0;
             start = false;
             reset();

@@ -22,25 +22,13 @@ public class Lift implements Subsystem {
     public DcMotorEx lower, middle, upper;
     HardwareMap hwMap;
 
-    public static double Kp = 0.007;
-    public static double Ki = 0.0002;
-    public static double Kd = 0.0000;
-    public static double Kg = 0.07;
-
-    PIDCoefficients coef = new PIDCoefficients(Kp, Ki, Kd);
-    BasicPID liftPID = new BasicPID(coef);
-
-    MotionConstraint up = new MotionConstraint(0,0, 0);
-    MotionConstraint down = new MotionConstraint(0, 0,0);
-    ProfiledPID controlLoop = new ProfiledPID(up, down, coef);
+    public static double Kg = 0.09; // Was 0.07
 
     public double position = 0;
-    public static double lowest = 0;
-    public static double smallPole = 150;
+    public static double smallPole = 100; // was 150
     public static double middlePole = 560;
     public static double highPole = 980;
     public static double highPoleBroken = 1220;
-    public static double top = 1300;
 
     public static double cone2 = 110;
     public static double cone3 = 150;
@@ -77,12 +65,6 @@ public class Lift implements Subsystem {
         manueal = false;
     }
 
-    public void regeneratePID() {
-        coef = new PIDCoefficients(Kp, Ki, Kd);
-        liftPID = new BasicPID(coef);
-        controlLoop = new ProfiledPID(up, down, coef);
-    }
-
     public Lift(Robot robot) {
         hwMap = robot.hwMap;
 
@@ -91,19 +73,21 @@ public class Lift implements Subsystem {
         upper = hwMap.get(DcMotorEx.class, "upperLift");
     }
 
-    public static double tolerance = 30;
+    double tolerance = 30;
+
+    public static double downSpeed = -0.25;
 
     public void runToPosition(double position) {
         error = position - getEncoderPosition();
         if(error < 0 && Math.abs(error) > tolerance) {
-            setPower(-0.2);
+            setPower(downSpeed + manPower);
         }
         else if(error > 0 && Math.abs(error) > tolerance) {
-            setPower(1);
+            setPower(1 + manPower);
         }
         else {
-            setPower(Kg);
-        }//
+            setPower(Kg + manPower);
+        }
     }
 
     public double getPosition() {
@@ -151,8 +135,6 @@ public class Lift implements Subsystem {
         //upper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //lower.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //middle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        //limitSwitch.setMode(DigitalChannel.Mode.INPUT);
     }
 
     @Override

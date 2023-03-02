@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff
+package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic
 
 abstract class Cart(var p8 : Pico8) {
     abstract fun map_data(): String

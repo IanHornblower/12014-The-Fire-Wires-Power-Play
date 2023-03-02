@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamServer;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
-@Disabled
 @Config
 @TeleOp
 public class CameraTesting extends LinearOpMode {
@@ -21,6 +20,8 @@ public class CameraTesting extends LinearOpMode {
         Robot rob = new Robot(hardwareMap, telemetry, Robot.OPMODE_TYPE.AUTO);
         rob.init();
 
+        telemetry = rob.getTelemetry();
+
 
         rob.FtcDashboardInstance.startCameraStream(rob.rearCamera.camera, 0);
         CameraStreamServer.getInstance().setSource(rob.rearCamera.camera);
@@ -29,8 +30,8 @@ public class CameraTesting extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()) {
 
-
-            telemetry.addData("Cone Error", rob.rearCamera.getObjectError());
+            telemetry.addLine(rob.rearCamera.getTelemetry());
+         //   telemetry.addData("Cone Error", rob.rearCamera.getObjectError());
 
             try {
                 rob.update();

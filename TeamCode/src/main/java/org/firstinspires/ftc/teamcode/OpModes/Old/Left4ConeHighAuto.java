@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.OpModes.Actual;
+package org.firstinspires.ftc.teamcode.OpModes.Old;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,15 +12,20 @@ import static org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff.O
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequence;
 import org.firstinspires.ftc.teamcode.ActionSystem.ActionSequenceRunner;
+import org.firstinspires.ftc.teamcode.Auto.HighTrajectories;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff.OpModeInformations;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.ConeManipulator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.RearCamera;
 import org.firstinspires.ftc.teamcode.util.Color;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 
+@Disabled
 @Autonomous(name = "Left Side 1+3 on High", group = "AUTO")
 public class Left4ConeHighAuto extends LinearOpMode  {
     @Override
@@ -52,47 +58,44 @@ public class Left4ConeHighAuto extends LinearOpMode  {
 
         if(isStopRequested()) return;
 
-        driveTrain.releasetOdom();
-        driveTrain.followTrajectory(rob.driveTrain.trajectoryBuilder(start, true) // To High Pole
-                .splineTo(new Vector2d(-33, -38), Math.toRadians(90))
-                .splineTo(new Vector2d(-28, -4), Math.toRadians(45))
-                .build());
-        driveTrain.waitFor(()-> rob.lift.getPosition() == Lift.cone5); // Adjust where it starts moving after drop
-        driveTrain.followTrajectory(rob.driveTrain.trajectoryBuilder(start, false) // To Cone Stack
-                .splineTo(new Vector2d(-62.5, -11.5), Math.toRadians(180))
-                .build());
+        HighTrajectories trajectories = new HighTrajectories(rob);
 
+
+        // Go to high Pole (DT)
+        driveTrain.releasetOdom();
+        //driveTrain.followTrajectory(trajectories.toHighPoleFromStart);
+        //driveTrain.waitFor(()-> rob.lift.getPosition() == Lift.cone5); // Adjust where it starts moving after drop
+        driveTrain.waitSeconds(0);
+        // Go to cone stack
+      //  driveTrain.followTrajectory(trajectories.toConeStackFromHighPole);
+       // driveTrain.waitSeconds(5);
+    //    driveTrain.followTrajectory(trajectories.toHighPoleFromConeStack);
+
+        // Go to high pole (LIFT)
         lift.closeClaw();
-        lift.intakeOut();
-        lift.liftTo(Lift.LIFT.HIGH, true);
-        lift.fourbarTo(ConeManipulator.V4BPreset.DROP);
+        //lift.intakeOut();
+        lift.fourbarTo(550, true);
+        lift.liftTo(Lift.LIFT.SUPERHIGH, true);
 
         // Drop Cone and return to intaking position
         lift.waitFor(()-> driveTrainRunner.isActionComplete(1));
-        lift.intakeOff();
-        lift.dropAndReturn(Lift.cone5);
 
-        //
+        lift.dropAndReturn(Lift.cone5);
         lift.waitFor(()-> driveTrainRunner.isActionComplete(3));
-        lift.fourbarTo(ConeManipulator.V4BPreset.DROP);
         lift.closeClaw();
         lift.waitSeconds(0.28);
-        lift.liftTo(Lift.LIFT.HIGH, true);
-        lift.fourbarTo(ConeManipulator.V4BPreset.VERTICAL);
+        lift.liftTo(Lift.LIFT.SUPERHIGH, true);
 
-        lift.waitFor(()-> driveTrainRunner.isActionComplete(1));
-        lift.intakeOff();
-        lift.dropAndReturn(Lift.cone5);
-        
 
 
         rob.release();
         rob.intake.setDirection(Intake.DIRECTION.back);
         rob.coneManipulator.close();
         sleep(500);
-        rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
+        rob.coneManipulator.setPosition(900); // Tune up value to be inside the 18" cube
 
-        CombinedTracker.ParkingPosition location = CombinedTracker.ParkingPosition.CENTER;
+
+        RearCamera.State location = RearCamera.State.NONE;
 
         while(opModeInInit() && !isStopRequested()) {
             telemetry.addLine(Color.WHITE.format("INIT FINISHED")); // Do this later | fancy title
@@ -119,7 +122,7 @@ public class Left4ConeHighAuto extends LinearOpMode  {
             case LEFT:
 
                 break;
-            case CENTER:
+            case MIDDLE:
 
                 break;
             case RIGHT:
@@ -132,6 +135,8 @@ public class Left4ConeHighAuto extends LinearOpMode  {
 
         rob.rearCamera.camera.stopStreaming();
         rob.rearCamera.camera.closeCameraDevice();
+
+        timer.reset();
 
         while(opModeIsActive() && !isStopRequested()) {
             if(!driveTrainRunner.isComplete()) {
@@ -154,9 +159,22 @@ public class Left4ConeHighAuto extends LinearOpMode  {
             if(driveTrainRunner.isComplete() && liftRunner.isComplete()) {
                 rob.driveTrain.setMotorPowers(0, 0,0, 0);
                 rob.retract();
-                stop();
+               // stop();
             }
 
+
+            telemetry.addLine(Color.WHITE.format("---------------AUTO DATA----------------"));
+            telemetry.addData("Time Elapsed in Auto", Color.LIME.format(MathUtil.roundPlaces(timer.currentSeconds(), 2)));
+            telemetry.addLine();
+            telemetry.addData("Robot Position", rob.driveTrain.getPoseEstimate().toString());
+            telemetry.addLine();
+            telemetry.addData("Lift Encoder State", rob.lift.getEncoderPosition());
+            telemetry.addData("Lift Encoder Referance", rob.lift.position);
+            telemetry.addLine();
+            telemetry.addData("Fourbar Encoder Target", rob.coneManipulator.position);
+            telemetry.addData("Fourbar Encoder State", rob.coneManipulator.fourbar.getCurrentPosition());
+            telemetry.addData("Fourbar Angle State", Math.toDegrees(rob.coneManipulator.getAngle()));
+            telemetry.addLine();
             telemetry.addData("Lift Step", liftRunner.getCurrentAction());
             telemetry.addData("Drive Train Step", driveTrainRunner.getCurrentAction());
             telemetry.update();

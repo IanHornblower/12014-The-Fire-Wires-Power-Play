@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.OpModeStuff;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-//import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.Celeste;
-//import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.Pico8;
+//import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic.Celeste;
+//import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic.Pico8;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.Celeste;
-import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.Pico8;
+import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic.Celeste;
+import org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic.Pico8;
 
 @Disabled
 @TeleOp

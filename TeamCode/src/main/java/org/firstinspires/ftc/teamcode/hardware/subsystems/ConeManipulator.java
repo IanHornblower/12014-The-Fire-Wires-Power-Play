@@ -23,24 +23,23 @@ import java.util.function.DoubleSupplier;
 @Config
 public class ConeManipulator implements Subsystem {
     public DcMotorEx fourbar;
-    Servo intake;
+    public Servo intake;
 
-    public static double kP = 0.0, kD = 0, h = 0;
-    public static double kF = 0.2;
+    double grabberOpen = 1;
+    double grabberTransfer = 0.5;
+    double grabberCorrect = 0.3;
+    double grabberClose = 0;
 
-    public static double speed = 0.0;
+    double ticksPerRev = 3895.9;
 
-    public static double grabberOpen = 1;
-    public static double grabberTransfer = 0.5;
-    public static double grabberCorrect = 0.3;
-    public static double grabberClose = 0;
+    public double position = 0;
 
-    double position = 0;
+    public static double tolerance = 50;
+    public static double slowDownValue = 350;
+    public static double kCos = 0.02;
 
-    //SqrtControl fourbar = new SqrtControl(new SqrtCoefficients(kP, kD, h));
-    //BasicPID loop = new BasicPID(new PIDCoefficients(0.0, 0.0, 0));
-   // SqrtControl mainLoop = new SqrtControl(new SqrtCoefficients(kP, kD, h));
-    double max = 0.6;
+    public static double speedSlow = 0.6;
+    public static double speedFast = 1;
 
     DoubleSupplier power = ()-> 0.0;
 
@@ -93,15 +92,14 @@ public class ConeManipulator implements Subsystem {
         PRIME(260, 2500),  // //
         GRAB(85, 2750), //`//
         DROP(1720, 1100), // //
+        SMALL_DROP(1620, 1200), // //
+        SMALL_CORRECT(1750, 1000),
         FAR_DROP(2200, 550), // //
         EMERGENCY_SMALL(1300, 0), // /X
-        TeleOpDROP(1480, 1100), // /x
         CORRECT_RIGHT(1900, 850), // //
         STACK1(510, 510),
         STACK2(420, 420),
-        STACK3(350, 350),
-        STACK4(250, 250);
-        //CORRECT_CONE();
+        STACK3(350, 350);
 
         double front, back;
 
@@ -135,14 +133,14 @@ public class ConeManipulator implements Subsystem {
     public void runToPosition(double position) {
         error = position - fourbar.getCurrentPosition();
 
-        if(Math.abs(error) < 50) {
+        if(Math.abs(error) < tolerance) {
             fourbar.setPower(0.0);
         }
-        else if(Math.abs(error) < 200) {
-            fourbar.setPower(Math.signum(error) * 0.5);
+        else if(Math.abs(error) < slowDownValue) {
+            fourbar.setPower(Math.signum(error) * 0.6); // 0.5
         }
         else {
-            fourbar.setPower(Math.signum(error) * 0.8);
+            fourbar.setPower(Math.signum(error) * 1); // 0.8
         }
     }
 
@@ -153,16 +151,16 @@ public class ConeManipulator implements Subsystem {
 
         double error = position - fourbar.getCurrentPosition();
         double angle = calc(fourbar.getCurrentPosition());
-        double Kcos = Math.cos(angle);
+        double ff = Math.sin(angle) * kCos;
 
         if(Math.abs(error) < 50) {
-            fourbar.setPower(0.0 + Kcos);
+            fourbar.setPower(0.0 + ff);
         }
-        else if(Math.abs(error) < 200) {
-            fourbar.setPower(Math.signum(error) * 0.5 + Kcos);
+        else if(Math.abs(error) < slowDownValue) {
+            fourbar.setPower(Math.signum(error) * speedSlow + ff);
         }
         else {
-            fourbar.setPower(Math.signum(error) * 0.8 + Kcos);
+            fourbar.setPower(Math.signum(error) * speedFast + ff);
         }
     }
 
@@ -220,26 +218,32 @@ public class ConeManipulator implements Subsystem {
     }
 
     private void dropConeAndReturnInit() {
+        dropConeAndReturn.addWait(0.01);
         dropConeAndReturn.addCustomAction(()-> setPosition(V4BPreset.CORRECT_RIGHT));
         dropConeAndReturn.addWait(0.1);
+        dropConeAndReturn.addCustomAction(()-> open());
+        dropConeAndReturn.addCustomAction(()-> open());
         dropConeAndReturn.addCustomAction(()-> open());
         dropConeAndReturn.addWait(0.15); // causes pull up
         dropConeAndReturn.addCustomAction(()-> setPosition(V4BPreset.PRIME));
         dropConeAndReturn.addCustomAction(()-> close());
-        dropConeAndReturn.addWait(0.2); // was 0.4 // delay for returning slides
+        //dropConeAndReturn.addWait(0.0); // was 0.4 // delay for returning slides
         dropConeAndReturn.addAction(new CustomAction(()-> robot.lift.setPosition(0)));
-        dropConeAndReturn.addWait(0);
+        //dropConeAndReturn.addWait(0);
         dropConeAndReturn.addAction(new CustomAction(()-> open()));
     }
 
     private void dropConeAndReturnFarInit() {
+        dropConeAndReturn.addWait(0.01);
         dropConeAndReturnFar.addCustomAction(()-> open());
+        dropConeAndReturn.addCustomAction(()-> open());
+        dropConeAndReturn.addCustomAction(()-> open());
         dropConeAndReturnFar.addWait(0.15); // causes pull up
         dropConeAndReturnFar.addCustomAction(()-> setPosition(V4BPreset.PRIME));
         dropConeAndReturnFar.addCustomAction(()-> close());
-        dropConeAndReturnFar.addWait(0.4);
+        //dropConeAndReturnFar.addWait(0.4);
         dropConeAndReturnFar.addAction(new CustomAction(()-> robot.lift.setPosition(0)));
-        dropConeAndReturnFar.addWait(0);
+        //dropConeAndReturnFar.addWait(0);
         dropConeAndReturnFar.addAction(new CustomAction(()-> open()));
     }
 
@@ -247,18 +251,21 @@ public class ConeManipulator implements Subsystem {
         raiseToTop.addAction(new CustomAction(()-> close()));
         raiseToTop.addCustomAction(()-> setPosition(V4BPreset.DROP));
         raiseToTop.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.highPole)));
+        raiseToMid.addCustomAction(()-> setPosition(V4BPreset.DROP));
     }
 
     private void raiseToMidInit() {
         raiseToMid.addAction(new CustomAction(()-> close()));
         raiseToMid.addCustomAction(()-> setPosition(V4BPreset.DROP));
         raiseToMid.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.middlePole)));
+        raiseToMid.addCustomAction(()-> setPosition(V4BPreset.DROP));
     }
 
     private void raiseToLowInit() {
         raiseToLow.addAction(new CustomAction(()-> close()));
-        raiseToLow.addCustomAction(()-> setPosition(V4BPreset.DROP));
+        raiseToLow.addCustomAction(()-> setPosition(V4BPreset.SMALL_DROP));
         raiseToLow.addAction(new CustomAction(()-> robot.lift.setPosition(Lift.smallPole)));
+        raiseToLow.addCustomAction(()-> setPosition(V4BPreset.SMALL_DROP));
     }
 
     private void raiseToGround() {
@@ -352,7 +359,7 @@ public class ConeManipulator implements Subsystem {
             action.run();
         }
 
-        runToPosition(position);
+        runToPosition(position, true);
     }
 
     @Override
@@ -369,9 +376,9 @@ public class ConeManipulator implements Subsystem {
         return calc(fourbar.getCurrentPosition());
     }
 
-    public static double calc(double enc) {
-        double slope = (Math.toRadians(180) - Math.toRadians(55))/ -1350;
+    public double calc(double enc) {
+        double ticksPerRadian = ticksPerRev / (Math.PI * 2.0);
 
-        return slope * (enc - 1350) + Math.toRadians(180);
+        return (enc / ticksPerRadian) + Math.toRadians(55);
     }
 }

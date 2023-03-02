@@ -22,11 +22,11 @@ public class Timer {
     }
 
     public void start() {
-        startTime = (long) (System.nanoTime());
+        startTime = System.nanoTime();
     }
 
     public void reset() {
-        startTime = (long) (System.nanoTime());
+        startTime = System.nanoTime();
     }
 
     public void pause() {

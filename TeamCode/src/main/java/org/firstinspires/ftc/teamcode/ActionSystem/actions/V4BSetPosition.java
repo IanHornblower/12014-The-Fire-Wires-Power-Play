@@ -12,7 +12,7 @@ public class V4BSetPosition extends Action {
     Robot robot;
     double position;
 
-    public static double tolerance = 50;
+    public double tolerance = 50;
 
     boolean instant = false;
 
@@ -29,7 +29,12 @@ public class V4BSetPosition extends Action {
 
     public V4BSetPosition(Robot robot, ConeManipulator.V4BPreset pos) {
         this.robot = robot;
-        this.position = position;
+        if(robot.intake.direction == Intake.DIRECTION.front) {
+            position = (pos.getFront());
+        }
+        else {
+            position = (pos.getBack());
+        }
     }
 
     public V4BSetPosition(Robot robot, ConeManipulator.V4BPreset pos, double tolerance) {
@@ -40,6 +45,7 @@ public class V4BSetPosition extends Action {
         else {
             position = (pos.getBack());
         }
+        this.tolerance = tolerance;
     }
 
     public V4BSetPosition(Robot robot, double position, boolean instant) {
@@ -57,7 +63,12 @@ public class V4BSetPosition extends Action {
 
     public V4BSetPosition(Robot robot, ConeManipulator.V4BPreset pos, boolean instant) {
         this.robot = robot;
-        this.position = position;
+        if(robot.intake.direction == Intake.DIRECTION.front) {
+            position = (pos.getFront());
+        }
+        else {
+            position = (pos.getBack());
+        }
         this.instant = instant;
     }
 
@@ -70,6 +81,7 @@ public class V4BSetPosition extends Action {
         else {
             position = (pos.getBack());
         }
+        this.tolerance = tolerance;
     }
 
     @Override

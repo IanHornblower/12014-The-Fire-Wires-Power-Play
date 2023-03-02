@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.Actual;
+package org.firstinspires.ftc.teamcode.OpModes.Old;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.vision.CombinedTracker;
 
+@Disabled
 @Autonomous
 public class RightSideAuto extends LinearOpMode {
     @Override
@@ -529,7 +530,9 @@ public class RightSideAuto extends LinearOpMode {
         rob.coneManipulator.setPosition(ConeManipulator.V4BPreset.DROP);
 
 
-        CombinedTracker.ParkingPosition location = CombinedTracker.ParkingPosition.CENTER;
+        //CombinedTracker.ParkingPosition location = CombinedTracker.ParkingPosition.CENTER;
+
+        RearCamera.State location = RearCamera.State.NONE;
 
 
         while(opModeInInit() && !isStopRequested()) {
@@ -553,7 +556,7 @@ public class RightSideAuto extends LinearOpMode {
             case LEFT:
                 rob.driveTrain.followTrajectorySequenceAsync(left);
                 break;
-            case CENTER:
+            case MIDDLE:
                 rob.driveTrain.followTrajectorySequenceAsync(middle);
                 break;
             case RIGHT:

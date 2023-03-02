@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.IMU;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Jimmy;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.Mogus;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.RearCamera;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.StandardTrackingWheelLocalizer;
 
@@ -30,6 +31,7 @@ public class Robot {
     public IMU imu;
     public RearCamera rearCamera;
     public StandardTrackingWheelLocalizer localizer;
+    public Mogus mogus;
 
     public final FtcDashboard FtcDashboardInstance = FtcDashboard.getInstance();
 
@@ -73,19 +75,24 @@ public class Robot {
                 intake = new Intake(this);
                 lift = new Lift(this);
                 coneManipulator = new ConeManipulator(this);
-                rearCamera = new RearCamera(this, hwMap);
+                mogus = new Mogus();
+               rearCamera = new RearCamera(this, hwMap);
 
-                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, rearCamera};
+                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, mogus};
+               subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, rearCamera, mogus};
                 break;
             case 1: // TeleOp
                 driveTrain = new SampleMecanumDrive(this);
                 intake = new Intake(this);
                 lift = new Lift(this);
+                mogus = new Mogus();
                 coneManipulator = new ConeManipulator(this);
 
-                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator};
+                subsystems = new Subsystem[] {driveTrain, intake, lift, coneManipulator, mogus};
                 break;
             case 2: // Testing
+                mogus = new Mogus();
+                subsystems = new Subsystem[] {mogus};
                 break;
 
         }

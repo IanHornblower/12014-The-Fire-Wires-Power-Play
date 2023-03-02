@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff
+package org.firstinspires.ftc.teamcode.SuperDuperUsefulStuff.CelesteClassic
 import kotlin.math.*
 
 class Celeste(p8: Pico8) : Cart(p8) {

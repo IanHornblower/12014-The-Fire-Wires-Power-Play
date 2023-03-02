@@ -94,7 +94,7 @@ public class DropAndReturn extends Action {
             case RETURN_LIFT:
                 robot.lift.setPosition(level);
 
-                if(Math.abs(error) > 30) state = STATE.OPEN_AFTER_RETURN;
+                if(Math.abs(error) < 30) state = STATE.OPEN_AFTER_RETURN;
                 break;
             case OPEN_AFTER_RETURN:
                 robot.coneManipulator.open();

@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
 
-@Disabled
+
 @TeleOp(name = "Localization testing")
 public class LocalizationTesting extends LinearOpMode {
 
@@ -36,12 +37,12 @@ public class LocalizationTesting extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()) {
 
-            //rob.driveTrain.driveFieldCentric(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x*0.8, 0);
+            rob.driveTrain.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x*0.8));
 
 
-            telemetry.addData("left", rob.localizer.getWheelPositions().get(0));
-            telemetry.addData("right", rob.localizer.getWheelPositions().get(1));
-            telemetry.addData("front", rob.localizer.getWheelPositions().get(2));
+            telemetry.addData("left", rob.driveTrain.getWheelPositions().get(0));
+            telemetry.addData("right", rob.driveTrain.getWheelPositions().get(3));
+            telemetry.addData("front", rob.driveTrain.getWheelPositions().get(1));
            // telemetry.addData("pose", rob.localizer.getPose().toString());
             telemetry.update();
 
